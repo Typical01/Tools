@@ -1,6 +1,8 @@
 .vs/
 build/*
+bin/
 
+*.aps
 *.sln
 *.exp
 *.pdb
