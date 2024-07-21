@@ -1,0 +1,11 @@
+.vs/
+build/*
+
+*.sln
+*.exp
+*.pdb
+*.obj
+*.recipe
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters

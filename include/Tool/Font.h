@@ -1,0 +1,47 @@
+﻿#pragma once
+
+#ifndef _FONT_H
+#define _FONT_H
+
+#include "Tools_Tool.h"
+#include <Windows.h>
+#include <vector>
+
+namespace Tools_Tool {
+	namespace WindowsSystem {
+
+		class TOOLS_TOOL_API WindowFont {
+		private:
+			static HFONT Font;
+
+			std::vector<HWND> 窗口句柄;
+
+		public:
+			WindowFont()
+			{
+				Font = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+				/*
+				Font = CreateFont(
+					-16, -7, 0, 0,
+					400, //粗度 一般这个值设为400
+					FALSE, //斜体
+					FALSE, //下划线
+					FALSE, //删除线
+					DEFAULT_CHARSET, OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,
+					FF_DONTCARE,
+					TEXT("微软雅黑")
+				);
+				*/
+			}
+			WindowFont(HFONT& hFont) {
+				Font = hFont;
+			}
+
+			void SetWindowFont(HWND&);
+			void SetFont(HFONT& hFont);
+		};
+#define 窗口字体 WindowFont
+	}
+}
+
+#endif
