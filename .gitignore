@@ -2,6 +2,8 @@
 build/*
 bin/*
 
+./*.bat
+
 *.aps
 *.sln
 *.exp
