@@ -1,6 +1,7 @@
-﻿#include "pch.h" //DLL标准
+﻿#include "pch.h"
 
 #include "CommonTools.h"
+#include "Message.h"
 
 #include <iostream>
 #include <io.h>
@@ -10,47 +11,6 @@
 
 #include <vector>
 #include <string>
-
-
-void Tools_Tool::WindowsSystem::ShellMessage::operator=(int message)
-{
-	if (message < 32)
-	{
-		this->Status = false;
-
-		//ShellExecute() 成功操作, 则传入为句柄
-		this->ErrorCode = message;
-		lgc((L"Shell消息[" + this->信息 + L"]: 错误😒 -> 代码(" + to_wstring(message) + L")").c_str(), lgm::er);
-	}
-	else
-	{
-		this->Status = true;
-		this->ErrorCode = message;
-		lgc((L"Shell消息[" + this->信息 + L"]: 成功 👌").c_str());
-	}
-}
-
-int Tools_Tool::WindowsSystem::ShellMessage::GetErrorCode()
-{
-	return this->ErrorCode;
-}
-
-bool Tools_Tool::WindowsSystem::ShellMessage::isSucceed()
-{
-	return this->Status;
-}
-
-void Tools_Tool::WindowsSystem::RegisterHotKeyMessage::operator=(int message)
-{
-	if (message > 0)
-	{
-		lgc((L"热键注册[" + this->信息 + L"]: 成功👌").c_str());
-	}
-	else
-	{
-		lgc((L"热键注册[" + this->信息 + L"]: 错误😒 -> 代码(" + to_wstring(message) + L")").c_str(), lgm::er);
-	}
-}
 
 
 void Tools_Tool::WindowsSystem::SetDisplaySize(int displayWidth, int displayHeight)
@@ -73,7 +33,7 @@ void Tools_Tool::WindowsSystem::StartFile(const wchar_t* filePath)
 	ShellExecuteW(NULL, L"open", filePath, NULL, NULL, SW_SHOW);
 }
 
-DWORD Tools_Tool::WindowsSystem::FindProcessIDByName(const std::string& processName) //0 not found ; other found; processName "processName.exe" 根据名称查找进程ID
+DWORD Tools_Tool::WindowsSystem::FindProcessIDByName(Ustr& processName) //0 not found ; other found; processName "processName.exe" 根据名称查找进程ID
 {
 	HANDLE hProcessSnap;
 	PROCESSENTRY32 pe32;
@@ -91,7 +51,7 @@ DWORD Tools_Tool::WindowsSystem::FindProcessIDByName(const std::string& processN
 	DWORD processId = 0;
 	do
 	{
-		if (std::wstring(pe32.szExeFile) == Tools_Tool::StringHandling::ANSIToUnicode(processName)) //进程名称
+		if ((Ustr)pe32.szExeFile == processName) //进程名称
 		{
 			processId = pe32.th32ProcessID; //进程ID
 			break;
@@ -235,11 +195,10 @@ TOOLS_TOOL_API bool Tools_Tool::WindowsSystem::IsUserAdmin()
 
 bool Tools_Tool::WindowsSystem::GainAdminPrivileges(const wchar_t* strApp)
 {
-	ShellMessage UserAdmin(_T("申请管理员权限"));
+	ShellMessage temp;
 
 	if (!IsUserAdmin()) { //非管理员权限, 则申请
 
-		//ShellExecuteEx(SHELLEXECUTEINFO)
 		/*SHELLEXECUTEINFO execinfo;
 		memset(&execinfo, 0, sizeof(execinfo));
 		execinfo.lpFile = strApp;
@@ -247,15 +206,13 @@ bool Tools_Tool::WindowsSystem::GainAdminPrivileges(const wchar_t* strApp)
 		execinfo.lpVerb = _T("runas");
 		execinfo.fMask = SEE_MASK_NO_CONSOLE;
 		execinfo.nShow = SW_SHOWDEFAULT;
+		ShellExecute(&execinfo);*/
 
-		ShellExecuteEx(&execinfo);*/
-
-		//ShellExecute(...)
-		UserAdmin = (int)ShellExecute(NULL, _T("runas"), strApp, NULL, NULL, SW_SHOWNORMAL);
+		ShellMessage UserAdmin(L"申请管理员权限", (int)ShellExecute(NULL, L"runas", strApp, NULL, NULL, SW_SHOWNORMAL));
+		temp = UserAdmin;
 	}
-
 	//成功申请时, 退出当前进程
-	if (UserAdmin.isSucceed()) {
+	if (temp.IsSucceed()) {
 		return true;
 	}
 
@@ -269,26 +226,30 @@ bool Tools_Tool::WindowsSystem::SetAutoRun(const wchar_t* valueName, const wchar
 
 	const wchar_t* regPath = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
 
-	// 打开注册表项
+	// 打开注册表项  
 	result = RegOpenKeyExW(HKEY_CURRENT_USER, regPath, 0, KEY_SET_VALUE, &hKey);
 	if (result != ERROR_SUCCESS) {
-		std::cerr << "RegOpenKeyEx failed: " << result << std::endl;
+		wchar_t msg[256];
+		swprintf_s(msg, sizeof(msg) / sizeof(wchar_t), L"打开密钥失败: %ld", result);
+		lgc(msg, lgm::er); // 假设 lgc 能够处理 wstring 和日志级别  
 		return false;
 	}
 
-	// 设置注册表值
-	result = RegSetValueExW(hKey, valueName, 0, REG_SZ, (const BYTE*)exePath, (_tcslen(exePath) + 1) * sizeof(char));
+	// 设置注册表值  
+	result = RegSetValueExW(hKey, valueName, 0, REG_SZ, (const BYTE*)exePath, (wcslen(exePath) + 1) * sizeof(wchar_t));
 	if (result != ERROR_SUCCESS) {
-		std::cerr << "RegSetValueEx failed: " << result << std::endl;
+		wchar_t msg[256];
+		swprintf_s(msg, sizeof(msg) / sizeof(wchar_t), L"设置注册表值失败: %ld", result);
+		lgc(msg, lgm::er);
 		RegCloseKey(hKey);
 		return false;
 	}
 
 	RegCloseKey(hKey);
+	lgc(L"注册表注册成功!", lgm::wr);
 	return true;
 }
-
-HRESULT Tools_Tool::WindowsSystem::CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszPathLink, LPCWSTR lpszIcon, LPCWSTR lpszDesc, LPCWSTR lpszArgs)
+HRESULT Tools_Tool::WindowsSystem::CreateLink(LPCWSTR 对象路径, LPCWSTR 快捷方式路径, LPCWSTR 图标路径, LPCWSTR 快捷方式描述, LPCWSTR 目标程序的参数)
 {
 	HRESULT hres;
 	IShellLink* psl;
@@ -303,18 +264,18 @@ HRESULT Tools_Tool::WindowsSystem::CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszP
 		IPersistFile* ppf;
 
 		// Set the path to the shortcut target and add the description. 
-		psl->SetPath(lpszPathObj);
-		if (lpszDesc)
+		psl->SetPath(对象路径);
+		if (快捷方式描述)
 		{
-			psl->SetDescription(lpszDesc);
+			psl->SetDescription(快捷方式描述);
 		}
-		if (lpszIcon)
+		if (图标路径)
 		{
-			psl->SetIconLocation(lpszIcon, 0);
+			psl->SetIconLocation(图标路径, 0);
 		}
-		if (lpszArgs)
+		if (目标程序的参数)
 		{
-			psl->SetArguments(lpszArgs);
+			psl->SetArguments(目标程序的参数);
 		}
 
 		// Query IShellLink for the IPersistFile interface, used for saving the 
@@ -329,7 +290,7 @@ HRESULT Tools_Tool::WindowsSystem::CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszP
 			MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH);
 			*/
 			// Save the link by calling IPersistFile::Save. 
-			hres = ppf->Save(lpszPathLink, TRUE);
+			hres = ppf->Save(快捷方式路径, TRUE);
 			ppf->Release();
 		}
 		psl->Release();
@@ -337,7 +298,7 @@ HRESULT Tools_Tool::WindowsSystem::CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszP
 	return hres;
 }
 
-std::wstring Tools_Tool::StringHandling::StringToWstring(const std::string& str)
+std::wstring Tools_Tool::StringHandling::StringToWstring(const std::string str)
 {
 	std::wstring wContext = L"";
 	int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);

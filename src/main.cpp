@@ -3,9 +3,6 @@
 
 #include "Setting.h"
 
-//#pragma comment(lib, "libTools_Tool.lib")
-
-
 int APIENTRY wWinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -13,17 +10,28 @@ int APIENTRY wWinMain(
     _In_ int nShowCmd
 )
 {
-    Setting.Windows程序启动项(hInstance);
+    Log::SetConsoleShow(false);
+    Log::SetConsoleTimeShow(false);
 
-    Setting.Windows窗口类注册((LPCWSTR)IDI_ICON256x);
+    if (!Windows程序启动项()) {
+        return 0;
+    }
 
-    Setting.Windows窗口创建();
+    Windows窗口类注册();
 
-    Setting.Windows窗口初始化((LPCWSTR)IDI_ICON256x);
+    Windows窗口创建();
+
+    初始化();
+
+    /*WinHost::注册进度条窗口类(hIns);
+    WH::设置进度条步进(1);
+    WH::创建进度条(L"进度条");*/
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {
+        /*Timers::sleep_s(50);
+        WH::增加进度条进度();*/
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }

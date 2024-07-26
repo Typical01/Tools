@@ -5,22 +5,26 @@
 
 //控制台初始化
 bool Tools_Tool::Log::FirstInitCMD = true;
-
-//bool Tools_Tool::Log::this->ShowLog = true;	   //显示日志
-//bool Tools_Tool::Log::this->ShowTime = true;    //显示时间
+bool Tools_Tool::Log::ShowTime = true;
 
 DWORD  Tools_Tool::written;
 HANDLE Tools_Tool::hConsoleOutput;
 HANDLE Tools_Tool::hConsoleError;
 
+
 void Tools_Tool::Log::SetShowLog(bool showLog)
 {
-	this->ShowLog = showLog;
+	ShowLog = showLog;
 }
 
-void Tools_Tool::Log::SetConsoleTimeShow(bool show)
+void Tools_Tool::Log::SetConsoleTimeShow(bool showTime)
 {
-	this->ShowTime = show;
+	ShowTime = showTime;
+}
+
+void Tools_Tool::Log::SetConsoleShow(bool showConsole)
+{
+	FirstInitCMD = showConsole;
 }
 
 std::wstring Tools_Tool::Log::StringToWstring(const std::string& str)
@@ -34,20 +38,4 @@ std::wstring Tools_Tool::Log::StringToWstring(const std::string& str)
 	delete[] buffer;
 
 	return wContext;
-}
-
-void Tools_Tool::SetShowLog(bool showLog)
-{
-	lg.SetShowLog(showLog);
-	lgc.SetShowLog(showLog);
-	lgr.SetShowLog(showLog);
-	lgcr.SetShowLog(showLog);
-}
-
-void Tools_Tool::SetConsoleTimeShow(bool show)
-{
-	lg.SetConsoleTimeShow(show);
-	lgc.SetConsoleTimeShow(show);
-	lgr.SetConsoleTimeShow(show);
-	lgcr.SetConsoleTimeShow(show);
 }

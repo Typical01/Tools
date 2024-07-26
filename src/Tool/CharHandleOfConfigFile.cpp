@@ -1,6 +1,4 @@
-﻿#include "pch.h" //DLL标准
-#include <utility> //DLL标准
-#include <limits.h> //DLL标准
+﻿#include "pch.h"
 
 #include "CharHandleOfConfigFile.h"
 
@@ -27,7 +25,7 @@ void Tools_Tool::StringHandling::CharHandleOfConfigFile::README() const
 	lgc(L"4.使用 写入文件()", lgm::ts);
 }
 
-bool Tools_Tool::StringHandling::CharHandleOfConfigFile::Init(const wchar_t* 传入配置文件路径, bool 解析)
+bool Tools_Tool::StringHandling::CharHandleOfConfigFile::Init(Ustr& 传入配置文件路径, bool 解析)
 {
 	//保存路径
 	this->配置文件_路径 = 传入配置文件路径;
@@ -39,10 +37,71 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::Init(const wchar_t* 传
 	errno_t err = _wfopen_s(&读取文件流指针, this->配置文件_路径.c_str(), L"r, ccs=UTF-8"); //以读取模式打开文件
 	if (err != 0)
 	{
-		lgc((L"\n文件: " + this->配置文件_路径 + L" 打开错误(或没有文件)!\n\n").c_str(), lgm::wr);
+		lgc((L"文件: " + this->配置文件_路径 + L" 打开错误(或没有文件)!").c_str(), lgm::wr);
+		if (读取文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
 		return false; //没有文件, 则不进行读取和解析
 	}
-	lgc((L"\n文件: " + this->配置文件_路径 + L" 打开成功\n\n").c_str(), lgm::wr);
+	lgc((L"文件: " + this->配置文件_路径 + L" 打开成功").c_str(), lgm::wr);
+
+	if (!解析)
+	{
+		return true;
+	}
+
+	//读取配置文件内容
+	wchar_t tempWchar_t[512] = L"";
+	int 空行计数 = 0;
+
+	lgc(L"文件: 开始读取...\n", lgm::wr);
+
+	while (!feof(读取文件流指针)) //feof: 文件尾时, 返回非0
+	{
+		fgetws(tempWchar_t, 512, 读取文件流指针); //读取一行, 最大字符容量 512
+		if (tempWchar_t == L"\n") //记录空行
+		{
+			this->空行位置统计.insert(空行计数);
+			空行计数++;
+		}
+		传入区域内容.push_back(tempWchar_t); //保存内容
+
+		//lg(L"读取字符: " + *tempWchar_t, lg::wr);
+	}
+	fclose(读取文件流指针);
+
+	if (this->解析(传入区域内容))
+	{
+		return true;
+	}
+	else
+	{
+		lg(L"文件中内容过少, 或不符合格式\n", lgm::wr);
+		return false;
+	}
+
+	return true;
+}
+
+bool Tools_Tool::StringHandling::CharHandleOfConfigFile::Init(Ustr&& 传入配置文件路径, bool 解析)
+{
+	//保存路径
+	this->配置文件_路径 = 传入配置文件路径;
+
+	std::vector<std::wstring> 传入区域内容;
+
+	//读取文件流
+	FILE* 读取文件流指针;
+	errno_t err = _wfopen_s(&读取文件流指针, this->配置文件_路径.c_str(), L"r, ccs=UTF-8"); //以读取模式打开文件
+	if (err != 0)
+	{
+		lgc((L"文件: " + this->配置文件_路径 + L" 打开错误(或没有文件)!").c_str(), lgm::wr);
+		if (读取文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
+		return false; //没有文件, 则不进行读取和解析
+	}
+	lgc((L"文件: " + this->配置文件_路径 + L" 打开成功").c_str(), lgm::wr);
 
 	if (!解析)
 	{
@@ -110,14 +169,14 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::添加区域(const wcha
 		}
 	}
 
-	//lg((L"区域设置: " + (std::wstring)传入区域设置).c_str(), lgm::wr);
+	lgc(L"区域设置: " + (std::wstring)传入区域设置, lgm::wr);
 
 	for (int i = 0; i < temp计数; i++)
 	{
 		//保存解析后的区域与内容
 		解析后的区域与内容.insert(std::make_pair(temp解析后的区域内容_First[i], temp解析后的区域内容_Second[i]));
 
-		lgc((L"first: [" + temp解析后的区域内容_First[i] + L"] |second:[" + temp解析后的区域内容_Second[i] + L"]").c_str(), lgm::wr);
+		lgc(L"first: [" + temp解析后的区域内容_First[i] + L"] |second:[" + temp解析后的区域内容_Second[i] + L"]", lgm::wr);
 	}
 	//在总容器中添加内容
 	std::pair<std::map<std::wstring, std::map<std::wstring, std::wstring>>::iterator, bool> tempPair \
@@ -190,7 +249,7 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::区域内容解析(std:
 		if (temp值.find(L"\n") != std::wstring::npos)
 		{
 			temp值.erase(temp值.size() - 1);
-			lgc((L"temp值: [" + temp值 + L"]").c_str());
+			//lgc((L"temp值: [" + temp值 + L"]").c_str());
 		}
 
 		传出分离后区域内容_First = temp键;
@@ -229,7 +288,7 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::区域设置解析(std:
 			//保存 区域设置名称
 			区域设置名称[temp_Int] = 传入区域设置[temp_Int + 1];
 		}
-		lgc((L"区域设置名称: [" + 区域设置名称 + L"]").c_str());
+		//lgc((L"区域设置名称: [" + 区域设置名称 + L"]").c_str());
 		传入区域设置 = 区域设置名称;
 
 		return true;
@@ -405,7 +464,7 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::格式化(std::vector<s
 	}
 }
 
-bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件()
+bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件(Ustr fopenMode)
 {
 	//#include <stdio.h>
 	//Unicode 字符集: utf8 编码
@@ -419,10 +478,14 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件()
 	FILE* 写入文件流指针;
 	//w+ 打开可读写文件，若文件存在则文件长度清为0，即该文件内容会消失。若文件不存在则建立该文件。
 	//主要是清空文件内容
-	errno_t err = _wfopen_s(&写入文件流指针, this->配置文件_路径.c_str(), L"w+, ccs=UTF-8");
+	Ustr FopenMode = fopenMode + L", ccs=UTF-8";
+	errno_t err = _wfopen_s(&写入文件流指针, this->配置文件_路径.c_str(), FopenMode.c_str());
 	if (err != 0)
 	{
 		lgc((L"文件: " + this->配置文件_路径 + L" 打开错误!\n").c_str(), lgm::wr);
+		if (写入文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
 		return false;
 	}
 	lgc((L"文件: " + this->配置文件_路径 + L" 打开成功\n").c_str(), lgm::wr);
@@ -442,7 +505,7 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件()
 	return true;
 }
 
-bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件(const wchar_t* 传入配置文件路径)
+bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件(Ustr 传入配置文件路径, Ustr fopenMode)
 {
 	//#include <stdio.h>
 	//Unicode 字符集: utf8 编码
@@ -456,13 +519,17 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件(const wcha
 	FILE* 写入文件流指针;
 	//w+ 打开可读写文件，若文件存在则文件长度清为0，即该文件内容会消失。若文件不存在则建立该文件。
 	//主要是清空文件内容
-	errno_t err = _wfopen_s(&写入文件流指针, 传入配置文件路径, L"w+, ccs=UTF-8");
+	Ustr FopenMode = fopenMode + L", ccs=UTF-8";
+	errno_t err = _wfopen_s(&写入文件流指针, 传入配置文件路径.c_str(), FopenMode.c_str());
 	if (err != 0)
 	{
-		lgc((L"文件: " + (std::wstring)传入配置文件路径 + L" 打开错误!\n").c_str(), lgm::wr);
+		lgc((L"文件: " + 传入配置文件路径 + L" 打开错误!\n").c_str(), lgm::wr);
+		if (写入文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
 		return false;
 	}
-	lgc((L"文件: " + (std::wstring)传入配置文件路径 + L" 打开成功\n").c_str(), lgm::wr);
+	lgc((L"文件: " + 传入配置文件路径 + L" 打开成功\n").c_str(), lgm::wr);
 
 	if (tempVec写入内容.size() > 2)
 	{
@@ -478,6 +545,65 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件(const wcha
 
 	return true;
 }
+bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件(std::vector<Ustr>& 传入文本内容, Ustr fopenMode)
+{
+	FILE* 写入文件流指针;
+	//w+ 打开可读写文件，若文件存在则文件长度清为0，即该文件内容会消失。若文件不存在则建立该文件。
+	//主要是清空文件内容
+	Ustr FopenMode = fopenMode + L", ccs=UTF-8";
+	errno_t err = _wfopen_s(&写入文件流指针, this->配置文件_路径.c_str(), FopenMode.c_str());
+	if (err != 0)
+	{
+		lgc((L"文件: " + (std::wstring)this->配置文件_路径 + L" 打开错误!\n").c_str(), lgm::wr);
+		if (写入文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
+		return false;
+	}
+	lgc((L"文件: " + (std::wstring)this->配置文件_路径 + L" 打开成功\n").c_str(), lgm::wr);
+
+	if (传入文本内容.size() > 0)
+	{
+		for (auto tempBegin = 传入文本内容.begin(); tempBegin != 传入文本内容.end(); tempBegin++)
+		{
+			fputws(tempBegin->c_str(), 写入文件流指针); // fputws 默认不带换行符, 格式化()中已添加
+			lgc((Ustr)L"写入缓冲字符: " + *tempBegin, lgm::wr);
+		}
+	}
+	fclose(写入文件流指针); //关闭后, 才将缓冲中的字符写入到文件中
+
+	return true;
+}
+
+bool Tools_Tool::StringHandling::CharHandleOfConfigFile::写入文件(Ustr 传入配置文件路径, std::vector<Ustr>& 传入文本内容, Ustr fopenMode)
+{
+	FILE* 写入文件流指针;
+	//w+ 打开可读写文件，若文件存在则文件长度清为0，即该文件内容会消失。若文件不存在则建立该文件。
+	//主要是清空文件内容
+	Ustr FopenMode = fopenMode + L", ccs=UTF-8";
+	errno_t err = _wfopen_s(&写入文件流指针, 传入配置文件路径.c_str(), FopenMode.c_str());
+	if (err != 0)
+	{
+		lgc((L"文件: " + 传入配置文件路径 + L" 打开错误!\n").c_str(), lgm::wr);
+		if (写入文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
+		return false;
+	}
+	lgc((L"文件: " + 传入配置文件路径 + L" 打开成功\n").c_str(), lgm::wr);
+
+	if (传入文本内容.size() > 0)
+	{
+		for (auto tempBegin = 传入文本内容.begin(); tempBegin != 传入文本内容.end(); tempBegin++)
+		{
+			fputws(tempBegin->c_str(), 写入文件流指针); // fputws 默认不带换行符, 格式化()中已添加
+			lgc((Ustr)L"写入缓冲字符: " + *tempBegin, lgm::wr);
+		}
+	}
+	fclose(写入文件流指针); //关闭后, 才将缓冲中的字符写入到文件中
+
+	return true;
+}
 
 bool Tools_Tool::StringHandling::CharHandleOfConfigFile::创建文件()
 {
@@ -488,6 +614,9 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::创建文件()
 	if (err != 0)
 	{
 		lgc((L"文件: " + this->配置文件_路径 + L" 创建错误!\n").c_str(), lgm::wr);
+		if (创建文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
 		return false;
 	}
 	lgc((L"文件: " + this->配置文件_路径 + L" 创建成功\n").c_str(), lgm::wr);
@@ -505,6 +634,9 @@ bool Tools_Tool::StringHandling::CharHandleOfConfigFile::创建文件(const wcha
 	if (err != 0)
 	{
 		lgc((L"文件: " + this->配置文件_路径 + L" 创建错误!\n").c_str(), lgm::wr);
+		if (创建文件流指针 == NULL) {
+			lgc(L"errno_t: " + Uto_string(err), lgm::er);
+		}
 		return false;
 	}
 	lgc((L"文件: " + this->配置文件_路径 + L" 创建成功\n").c_str(), lgm::wr);

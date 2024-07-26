@@ -1,6 +1,4 @@
-﻿#include "pch.h" //DLL标准
-#include <utility> //DLL标准
-#include <limits.h> //DLL标准
+﻿#include "pch.h" 
 
 #include "Timers.h"
 
@@ -132,12 +130,12 @@ long long Tools_Tool::Timers::ComputationFrontToBackInterval()
 long long Tools_Tool::Timers::ComputationInterval(int LocationBegin, int LocationEnd)
 {
 	if (LocationBegin < 0) {
-		lgc(TEXT("时间戳位置小于 0"), lgm::er);
+		throw std::runtime_error("Tools_Tool::Timers::ComputationInterval(): LocationBegin < 0");
 
 		return 0;
 	}
 	else if (LocationEnd > this->TimerContainer.size() - 1) {
-		lgc(TEXT("时间戳位置大于 Vector.size() - 1"), lgm::er);
+		throw std::runtime_error("Tools_Tool::Timers::ComputationInterval(): LocationEnd > TimerContainer.size() - 1");
 
 		return 0;
 	}

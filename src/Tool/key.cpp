@@ -1,6 +1,4 @@
-﻿#include "pch.h" //DLL标准
-#include <utility> //DLL标准
-#include <limits.h> //DLL标准
+﻿#include "pch.h" 
 
 #include "Key.h"
 #include <string>
@@ -51,10 +49,6 @@ void WindowsSystem::Key::ExitProcedure(int i, const char* c)
 
 void WindowsSystem::Key::keyJudge_Mouse(int i, int i2, int i3)
 {
-	// (int)MOUSEEVENTF_RIGHTDOWN = 1
-	// (int)MOUSEEVENTF_LEFTDOWN = 2
-	// (int)MOUSEEVENTF_RIGHTUP = 3
-	// (int)MOUSEEVENTF_LEFTUP = 4
 	mouse_event(i, 0, 0, 0, 0); 
 	Sleep(i3);
 	mouse_event(i2, 0, 0, 0, 0); 

@@ -1,6 +1,4 @@
-﻿#include "pch.h" //DLL标准
-#include <utility> //DLL标准
-#include <limits.h> //DLL标准
+﻿#include "pch.h"
 
 #include "ToolsConfigFile.h"
 #include "CommonTools.h"
@@ -92,6 +90,11 @@ std::wstring Tools_Tool::ToolsConfigFile::Get程序配置文件夹路径() const
 	return this->程序父文件夹_路径名 + this->配置文件夹_名;
 }
 
+Ustr Tools_Tool::ToolsConfigFile::Get程序路径() const
+{
+	return this->程序_路径名;
+}
+
 void Tools_Tool::ToolsConfigFile::创建配置文件()
 {
 	CharHandleOfConfigFile 配置文件;
@@ -104,10 +107,11 @@ void Tools_Tool::ToolsConfigFile::创建配置文件()
 		区域内容.push_back(L"原本屏幕分辨率高=1080");
 		区域内容.push_back(L"修改的屏幕分辨率宽=1280");
 		区域内容.push_back(L"修改的屏幕分辨率高=1024");
-		区域内容.push_back(L"repos=C:\\Users\\22793\\source\\repos");
+		区域内容.push_back(L"Repos=C:\\Users\\22793\\source\\repos");
 		区域内容.push_back(L"Lib=C:\\Typical\\ProgramProject\\C++\\Libs");
 		区域内容.push_back(L"笔记本键盘开关状态=开");
 		区域内容.push_back(L"nvidia-smi=关");
+		区域内容.push_back(L"注册表开机自启动=否");
 
 		配置文件.添加区域(L"基本设置", 区域内容);
 		配置文件.写入文件();
