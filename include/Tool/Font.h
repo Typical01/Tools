@@ -14,8 +14,6 @@ namespace Tools_Tool {
 		private:
 			static HFONT Font;
 
-			std::vector<HWND> 窗口句柄;
-
 		public:
 			WindowFont()
 			{
@@ -33,12 +31,14 @@ namespace Tools_Tool {
 				);
 				*/
 			}
-			WindowFont(HFONT& hFont) {
+			WindowFont(HFONT hFont) {
 				Font = hFont;
 			}
 
-			void SetWindowFont(HWND&);
-			void SetFont(HFONT& hFont);
+			void SetFont(HFONT hFont);
+
+		public:
+			void SetWindowFont(HWND hwnd);
 		};
 #define 窗口字体 WindowFont
 	}

@@ -3,91 +3,115 @@
 #ifndef _SETTING_H
 #define _SETTING_H
 
+#include "resource.h"
 #include "ToolsConfigFile.h"
-#include "Log.h"
+#include "Log.h" 
+#include "Timers.h" 
+#include "WindowHosting.h"
+#include "Message.h"
+#include "Shell.h"
+#include "Hotkey.h"
 
 #include <Windows.h>
 #include <string>
 
 using namespace Tools_Tool;
 using namespace Tools_Tool::WindowsSystem;
+using Tools_Tool::WindowsSystem::WindowHosting;
+using Tools_Tool::WindowsSystem::WindowHotkey;
 
-class Tools {
+class Settings {
 public:
-	//Windows
-	const wchar_t* 程序_名 = L"Tools";
-	const wchar_t* 程序_窗口类名 = L"典型一号的工具箱";
-	const wchar_t* 程序_窗口类名2 = L"典型一号的工具箱2";
-	const wchar_t* 程序_标题栏名 = L"典型一号的工具箱 v1.0";
-	const wchar_t* 程序_标题栏名_子窗口 = L"典型一号的工具箱_子窗口test";
-
-	//Icon
-#define IDI_ICON256x 100
-
-//按键
-#define ID_帮助 1099
-#define ID_退出 1000
-#define ID_工具箱配置 1001
-#define ID_清单 1002
-#define ID_笔记本键盘开关 1003
-#define ID_修改屏幕分辨率 1004
-#define ID_Repos 1005
-#define ID_Lib 1006
-#define ID_Ping 1007
-#define ID_子窗口test 1008
-
-//热键ID
-
-
-	Tools_Tool::ToolsConfigFile 工具箱配置文件;
-
-	int 进度条百分比值 = 0;
-
-	HINSTANCE hInstance;
-	HWND hWnd, hWnd_子窗口, hWnd_进度条;
+#define WM_TRAY WM_USER + 1
+	//窗口参数
+	HINSTANCE hIns;
+	HWND hWnd_托盘;
+	HWND hWnd_设置, hWnd_确认, hWnd_取消;
+	HWND hWnd_标签;
 	HMENU hMenu;
+	LPWSTR Icon;
+	NOTIFYICONDATA nid = { 0 };
+	UINT WM_TASKBARCREATED;
 
-	NOTIFYICONDATA nid;
+	const wchar_t* 程序_名 = L"Tools";
+	//SetWindowLongPtr(hwndEdit, GWLP_WNDPROC, (LONG_PTR)SubclassedEditProc);
+	const wchar_t* 程序_窗口类名 = L"典型一号的工具箱";
+	/*const wchar_t* 程序_设置窗口类名 = L"典型一号的工具箱设置";
+	const wchar_t* 程序_标签窗口类名 = L"典型一号的工具箱标签";*/
 
+	const wchar_t* 程序_托盘名 = L"工具箱托盘菜单";
+	const wchar_t* 程序_标题栏名 = L"典型一号的工具箱 v1.0";
+	const wchar_t* 程序_标题栏名_设置窗口 = L"工具箱设置";
+	const wchar_t* 程序_标题栏名_标签窗口 = L"工具箱标签";
+
+	//窗口操作
+	WindowHosting WinHost;
+	WL 设置窗口位置;
+
+	//设置
+	Tools_Tool::ToolsConfigFile 工具箱配置文件;
+	int 进度条百分比值 = 0;
 	bool 修改屏幕分辨率 = false;
-
-	//笔记本键盘
 	std::wstring 笔记本键盘关闭 = L"sc config i8042prt start= disabled"; //关闭
 	std::wstring 笔记本键盘开启 = L"sc config i8042prt start= auto"; //开启
+	std::wstring 设置_原屏幕分辨率宽;
+	std::wstring 设置_原屏幕分辨率高;
+	std::wstring 设置_修改屏幕分辨率宽;
+	std::wstring 设置_修改屏幕分辨率高;
+	std::wstring 设置_笔记本键盘开关状态;
+	std::wstring 设置_Repos;
+	std::wstring 设置_Lib;
+	std::wstring 设置_Nvidia;
+	std::wstring 设置_开机自启动;
 
-	//配置文件内容
-	std::wstring 配置文件_原本屏幕分辨率宽;
-	std::wstring 配置文件_原本屏幕分辨率高;
-	std::wstring 配置文件_修改的屏幕分辨率宽;
-	std::wstring 配置文件_修改的屏幕分辨率高;
-	std::wstring 配置文件_笔记本键盘开关状态;
-	std::wstring 配置文件_Repos;
-	std::wstring 配置文件_Lib;
-	std::wstring 配置文件_nvidia;
+	//菜单句柄
+	//std::map<Ustr, int> hMenuMap;
+	int ID_帮助;
+	int ID_退出;
+	int ID_工具箱设置;
+	int ID_标签;
+	int ID_笔记本键盘开关;
+	int ID_修改屏幕分辨率;
+	int ID_Ping;
 
-	//更新配置文件内容
-	void UpdateConfig();
+	int 标签菜单_Add;
+	int 标签菜单_Set;
+	int 标签菜单_Del;
+	int 标签菜单_Setting;
+	int 标签菜单_Help;
 
-	/*
-	* 单实例程序
-	* 设置DPI
-	* 保存进程句柄
-	*/
-	void Windows程序启动项(HINSTANCE&);
+	int 确认按钮;
+	int 取消按钮;
 
-	void Windows窗口类注册(LPCWSTR icon);
+	//快捷键
+	int 菜单_修改分辨率;
+	int 菜单_打开Repos;
+	int 菜单_打开Lib;
+	int 标签_全选;
 
-	void Windows窗口创建();
-
-	void Windows窗口初始化(LPCWSTR icon);
+public:
+	Settings() {}
 };
-static Tools Setting;
+static Settings Tools;
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+//更新配置文件内容
+void UpdateConfig();
 
-LRESULT CALLBACK ChildWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+/*
+* 单实例程序
+* 设置DPI
+* 保存进程句柄
+*/
+int Windows程序启动项();
+void Windows窗口类注册();
+void Windows窗口创建();
+//窗口创建后的初始化: WM_CREATE
+void 初始化();
 
-//进度条消息过程
-LONG_PTR CALLBACK WindowProcedure(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+void 菜单选择(int 菜单选项ID);
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK SettingWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+//LRESULT CALLBACK TipsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 #endif

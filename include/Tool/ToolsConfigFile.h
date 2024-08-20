@@ -66,7 +66,8 @@ namespace Tools_Tool {
 	public:
 		ToolsConfigFile()
 		{
-		};
+
+		}
 		ToolsConfigFile(std::wstring& 程序_名)
 		{
 			初始化(程序_名);
@@ -83,6 +84,8 @@ namespace Tools_Tool {
 
 		std::wstring Get程序父文件夹路径() const;
 		std::wstring Get程序配置文件夹路径() const;
+
+		Ustr Get程序路径() const;
 
 	public:
 		//打开配置文件: windows

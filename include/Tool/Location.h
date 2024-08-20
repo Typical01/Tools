@@ -4,6 +4,7 @@
 #define _LOCATION_H
 
 #include "Tools_Tool.h"
+#include "Log.h"
 #include <Windows.h>
 
 namespace Tools_Tool {
@@ -12,64 +13,45 @@ namespace Tools_Tool {
 		class TOOLS_TOOL_API WindowLocationInfo {
 #define 窗口位置信息 WindowLocationInfo
 		private:
-			RECT* Rect;
+			RECT* Rect工作区;
+			RECT* Rect客户区;
 		public:
 
 			//主窗口
-			int Width;
-			int Height;
-			int LocationX;
-			int LocationY;
-#define 窗口宽 wWidth;
-#define 窗口高 wHeight;
-#define 窗口X LocationX;
-#define 窗口Y LocationY;
+			int 窗口宽;
+			int 窗口高;
+			int 窗口X;
+			int 窗口Y;
 
 			//客户区
-			int ClientWidth;
-			int ClientHeight;
-			int ClientLocationX;
-			int ClientLocationY;
-#define 客户区宽 ClientWidth;
-#define 客户区高 ClientHeight;
-#define 客户区X ClientLocationX;
-#define 客户区Y ClientLocationY;
+			int 客户区宽;
+			int 客户区高;
+			int 客户区X;
+			int 客户区Y;
 
 		public:
-			WindowLocationInfo(HWND& hwnd) {
+			WindowLocationInfo() {}
+			WindowLocationInfo(HWND& hwnd)
+			{
 				//获取窗口大小
-				GetWindowRect(hwnd, Rect);
-				ClientWidth = Rect->right;
-				ClientHeight = Rect->bottom;
-				ClientLocationX = Rect->left;
-				ClientLocationY = Rect->top;
+				GetWindowRect(hwnd, Rect工作区);
+				窗口宽 = Rect工作区->right;
+				窗口高 = Rect工作区->bottom;
+				窗口X = Rect工作区->left;
+				窗口Y = Rect工作区->top;
 
 				//获取窗口客户区范围
-				GetClientRect(hwnd, Rect);
-				Width = Rect->right - Rect->left;
-				Height = Rect->bottom - Rect->top;
-				LocationX = Rect->left;
-				LocationY = Rect->top;
+				GetClientRect(hwnd, Rect客户区);
+				客户区宽 = Rect客户区->right - Rect客户区->left;
+				客户区高 = Rect客户区->bottom - Rect客户区->top;
+				客户区X = Rect客户区->left;
+				客户区Y = Rect客户区->top;
 			}
-//
-//			int GetWindowWidth();
-//			int GetWindowHeight();
-//			int GetWindowLocationX();
-//			int GetWindowLocationY();
-//#define Get窗口宽度 GetWindowWidth;
-//#define Get窗口高度 GetWindowHeight;
-//#define Get窗口位置X GetWindowLocationX;
-//#define Get窗口位置Y GetWindowLocationY;
-//
-//			int GetClientWidth();
-//			int GetClientHeight();
-//			int GetClientLocationX();
-//			int GetClientLocationY();
-//#define Get客户区宽度 GetClientClientWidth;
-//#define Get客户区高度 GetClientClientHeight;
-//#define Get客户区位置X GetClientClientLocationX;
-//#define Get客户区位置Y GetClientClientLocationY;
+
+			void GetInfo(HWND& hwnd);
 		};
+		using WinLocation = WindowLocationInfo;
+		using WL = WindowLocationInfo;
 	}
 }
 

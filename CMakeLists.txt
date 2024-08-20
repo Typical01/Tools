@@ -25,3 +25,19 @@ set_target_properties(Tools PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 set_target_properties(Tools PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin
 )
+
+# 添加自定义命令以复制头文件
+add_custom_command(
+    TARGET Tools POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+            C:\Typical\ProgramProject\C++\Libs\Tools\Tools_Tool\include\Tool
+)
+
+# 添加自定义命令以复制源文件
+add_custom_command(
+    TARGET Tools POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+            C:\Typical\ProgramProject\C++\Libs\Tools\Tools_Tool\src\Tool
+)

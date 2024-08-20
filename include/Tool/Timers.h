@@ -5,11 +5,39 @@
 #define _TIMERS_H_
 
 #include "Tools_Tool.h"
-#include "Log.h"
+//#include "CommonTools.h"
+//#include "Log.h"
+
+#include <Windows.h>
 
 #include <vector>
 #include <chrono>
 #include <thread> // 用于模拟延迟
+#include <iomanip>
+#include <ctime>
+#include <sstream>
+#include <locale>
+
+
+#ifdef UNICODE
+#define Uchar wchar_t
+#define Ustr std::wstring
+#define Ucout std::wcout
+#define Ucerr std::wcerr
+#define Uto_string std::to_wstring
+#define Ufreopen_s _wfreopen_s
+#define Ustrlen wcslen
+
+#else
+#define Uchar char
+#define Ustr std::string
+#define Ucout std::cout
+#define Ucerr std::cerr
+#define Uto_string std::to_string
+#define Ufreopen_s freopen_s
+#define Ustrlen strlen
+
+#endif
 
 namespace Tools_Tool {
 
@@ -52,6 +80,20 @@ namespace Tools_Tool {
 				TimerContainer.push_back(InitTime);
 				this->timeMeasure = tms;
 			}
+		}
+
+		template<class T = bool>
+		std::wstring StringToWstring(const std::string str)
+		{
+			std::wstring wContext = L"";
+			int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);
+			WCHAR* buffer = new WCHAR[len + 1];
+			MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), buffer, len);
+			buffer[len] = '\0';
+			wContext.append(buffer);
+			delete[] buffer;
+
+			return wContext;
 		}
 
 	public:
@@ -115,10 +157,55 @@ namespace Tools_Tool {
 		int GetTimerSize();
 		int GetTimerSize_s();
 
+		template<class Temp = bool>
+		static void FormattingTime(Ustr& text)
+		{
+			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
+			// 获取当前时间点（自epoch以来的时间）
+			// 将时间点转换为time_t（用于localtime函数）
+			std::time_t tm = std::chrono::system_clock::to_time_t(now);
+			// 使用localtime函数将time_t转换为本地时间（std::tm结构）
+			std::tm* now_tm = std::localtime(&tm);
+
+			// 使用 std::put_time 格式化时间
+			std::ostringstream oss;
+			oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
+			Ustr temp = (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+			text = temp;
+		}
+		template<class Temp = bool>
+		static Ustr FormattingTime(Ustr& text)
+		{
+			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
+			// 获取当前时间点（自epoch以来的时间）
+			// 将时间点转换为time_t（用于localtime函数）
+			std::time_t tm = std::chrono::system_clock::to_time_t(now);
+			// 使用localtime函数将time_t转换为本地时间（std::tm结构）
+			std::tm* now_tm = std::localtime(&tm);
+
+			// 使用 std::put_time 格式化时间
+			std::ostringstream oss;
+			oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
+			return (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+		}
+		template<class Temp = bool>
+		static Ustr FormattingTime(Ustr&& text)
+		{
+			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
+			// 获取当前时间点（自epoch以来的时间）
+			// 将时间点转换为time_t（用于localtime函数）
+			std::time_t tm = std::chrono::system_clock::to_time_t(now);
+			// 使用localtime函数将time_t转换为本地时间（std::tm结构）
+			std::tm* now_tm = std::localtime(&tm);
+
+			// 使用 std::put_time 格式化时间
+			std::ostringstream oss;
+			oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
+			return (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+		}
+#define 格式化时间 = FormattingTime;
+
 	};
 }
-/*
-Tool
-*/
 
 #endif

@@ -10,7 +10,7 @@
 
 
 #include "Tools_Tool.h"
-#include "Timers.h"
+//#include "Timers.h"
 //#include "CommonTools.h"
 
 #include <iostream>
@@ -115,16 +115,29 @@ namespace Tools_Tool
 	class TOOLS_TOOL_API Log {
 	private:
 		static bool FirstInitCMD; //控制台初始化
+		static bool ShowTime;
 
 		bool Release;
 		bool Mode_Cmd;
-		bool ShowLog;
-		bool ShowTime;
 
 	public:
+		bool ShowLog;
+	public:
 		Log(bool release, bool mode_Cmd)
-			: Release(release), Mode_Cmd(mode_Cmd), ShowLog(true), ShowTime(true)
+			: Release(release), Mode_Cmd(mode_Cmd), ShowLog(true) {	}
+
+	public:
+		void SetShowLog(bool showLog);
+#define 设置日志显示 SetShowLog
+		static void SetConsoleTimeShow(bool showTime);
+#define 设置时间显示 SetConsoleTimeShow
+
+		static void SetConsoleShow(bool showConsole);
+
+		template<class Temp = bool>
+		void Init()
 		{
+			//控制台初始化
 			if (FirstInitCMD)
 			{
 				Ucout.imbue(std::locale(""));
@@ -133,27 +146,26 @@ namespace Tools_Tool
 				if (FreeConsole() == 0)
 				{
 #ifdef _English
-					MessageBox(0, TEXT("log: detached console failure!"), TEXT("error"), 0);
-					MessageBox(0, (TEXT("error code: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: detached console failure!"), TEXT("error"), MB_ICONSTOP);
+					MessageBox(0, (TEXT("error code: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), MB_ICONSTOP);
 #else
 
-					MessageBox(0, TEXT("log: 分离控制台失败!"), TEXT(Log_er), 0);
-					MessageBox(0, (TEXT("错误代码: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: 分离控制台失败!"), TEXT(Log_er), MB_ICONSTOP);
+					MessageBox(0, (TEXT("错误代码: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), MB_ICONSTOP);
 #endif
 				}
 				if (AllocConsole() == 0)
 				{
 #ifdef _English
-					MessageBox(0, TEXT("log: assignment console failure!"), TEXT(Log_er), 0);
-					MessageBox(0, (TEXT("error code: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: assignment console failure!"), TEXT(Log_er), MB_ICONSTOP);
+					MessageBox(0, (TEXT("error code: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), MB_ICONSTOP);
 #else
-					MessageBox(0, TEXT("log: 分配控制台失败!"), TEXT(Log_er), 0);
-					MessageBox(0, (TEXT("错误代码: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: 分配控制台失败!"), TEXT(Log_er), MB_ICONSTOP);
+					MessageBox(0, (TEXT("错误代码: ") + Uto_string(GetLastError())).c_str(), TEXT(Log_er), MB_ICONSTOP);
 #endif
 				}
 				FILE* cmd_w_stream;
 				Ufreopen_s(&cmd_w_stream, TEXT("conout$"), TEXT("wt"), stdout);
-#endif
 
 				//GetStdHandle() -> setconsoletextcolor()的过程中
 				//好像不能将其放在静态对象的类(static class Log lg)中, 需要获取到标准输出/错误/其他的句柄后, 再修改颜色
@@ -162,32 +174,25 @@ namespace Tools_Tool
 				hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 				if (hConsoleOutput == INVALID_HANDLE_VALUE) {
 #ifdef _English
-					MessageBox(0, TEXT("log: get STD_OUTPUT_HANDLE fail!"), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: get STD_OUTPUT_HANDLE fail!"), TEXT(Log_er), MB_ICONSTOP);
 #else
-					MessageBox(0, TEXT("log: 获取 STD_OUTPUT_HANDLE fail!"), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: 获取 STD_OUTPUT_HANDLE fail!"), TEXT(Log_er), MB_ICONSTOP);
 #endif
 				}
 
 				hConsoleError = GetStdHandle(STD_ERROR_HANDLE);
 				if (hConsoleError == INVALID_HANDLE_VALUE) {
 #ifdef _English
-					MessageBox(0, TEXT("log: get STD_ERROR_HANDLE fail!"), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: get STD_ERROR_HANDLE fail!"), TEXT(Log_er), MB_ICONSTOP);
 #else
-					MessageBox(0, TEXT("log: 获取 STD_ERROR_HANDLE fail!"), TEXT(Log_er), 0);
+					MessageBox(0, TEXT("log: 获取 STD_ERROR_HANDLE fail!"), TEXT(Log_er), MB_ICONSTOP);
 #endif
 				}
+#endif
 
 				FirstInitCMD = false;
 			}
 		}
-
-
-	public:
-		void SetShowLog(bool showLog);
-#define 设置日志显示 SetShowLog
-		void SetConsoleTimeShow(bool show);
-#define 设置时间显示 SetConsoleTimeShow
-
 
 	private:
 		std::wstring StringToWstring(const std::string& str);
@@ -299,10 +304,11 @@ namespace Tools_Tool
 			}
 			SetConsoleTextColor_Error(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 		}
+		
 		template<class Temp = bool>
 		Ustr FormattingConsoleTimeShow(Ustr& text)
 		{
-			if (this->ShowTime) {
+			if (ShowTime) {
 				std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
 				// 获取当前时间点（自epoch以来的时间）
 				// 将时间点转换为time_t（用于localtime函数）
@@ -313,7 +319,7 @@ namespace Tools_Tool
 				// 使用 std::put_time 格式化时间
 				std::ostringstream oss;
 				oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
-				Ustr temp = (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+				Ustr temp = (Ustr)TEXT("[") + Log::StringToWstring(oss.str()) + TEXT("]") + text;
 
 				return temp;
 			}
@@ -322,7 +328,7 @@ namespace Tools_Tool
 		template<class Temp = bool>
 		Ustr FormattingConsoleTimeShow(Ustr&& text)
 		{
-			if (this->ShowTime) {
+			if (ShowTime) {
 				std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
 				// 获取当前时间点（自epoch以来的时间）
 				// 将时间点转换为time_t（用于localtime函数）
@@ -333,12 +339,52 @@ namespace Tools_Tool
 				// 使用 std::put_time 格式化时间
 				std::ostringstream oss;
 				oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
-				Ustr temp = (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+				Ustr temp = (Ustr)TEXT("[") + Log::StringToWstring(oss.str()) + TEXT("]") + text;
 
 				return temp;
 			}
 			return text;
 		}
+		//template<class Temp = bool>
+		//Ustr& FormattingConsoleTimeShow(Ustr& text)
+		//{
+		//	if (this->ShowTime) {
+		//		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
+		//		// 获取当前时间点（自epoch以来的时间）
+		//		// 将时间点转换为time_t（用于localtime函数）
+		//		std::time_t tm = std::chrono::system_clock::to_time_t(now);
+		//		// 使用localtime函数将time_t转换为本地时间（std::tm结构）
+		//		std::tm* now_tm = std::localtime(&tm);
+
+		//		// 使用 std::put_time 格式化时间
+		//		std::ostringstream oss;
+		//		oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
+		//		Ustr temp = (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+
+		//		return temp;
+		//	}
+		//	return text;
+		//}
+		//template<class Temp = bool>
+		//Ustr&& FormattingConsoleTimeShow(Ustr&& text)
+		//{
+		//	if (this->ShowTime) {
+		//		std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
+		//		// 获取当前时间点（自epoch以来的时间）
+		//		// 将时间点转换为time_t（用于localtime函数）
+		//		std::time_t tm = std::chrono::system_clock::to_time_t(now);
+		//		// 使用localtime函数将time_t转换为本地时间（std::tm结构）
+		//		std::tm* now_tm = std::localtime(&tm);
+
+		//		// 使用 std::put_time 格式化时间
+		//		std::ostringstream oss;
+		//		oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
+		//		Ustr temp = (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+
+		//		return temp;
+		//	}
+		//	return text;
+		//}
 
 
 		template<class T = bool>
@@ -575,107 +621,86 @@ namespace Tools_Tool
 		template<class T = bool>
 		void Logs(Ustr& text, Ustr& title)
 		{
-			if (ShowLog)
-			{
 #ifdef _DEBUG
-				Logs_ustr_ustr(text, title);
-				return;
+			Logs_ustr_ustr(text, title);
+			return;
 #endif
-				if (Release)
-				{
-					Logs_ustr_ustr(text, title);
-				}
+			if (Release)
+			{
+				Logs_ustr_ustr(text, title);
 			}
 		}
 		template<class T = bool>
 		void Logs(Ustr&& text, Ustr&& title)
 		{
-			if (ShowLog)
-			{
 #ifdef _DEBUG
-				Logs_ustr_ustr(text, title);
-				return;
+			Logs_ustr_ustr(text, title);
+			return;
 #endif
-				if (Release)
-				{
-					Logs_ustr_ustr(text, title);
-				}
+			if (Release)
+			{
+				Logs_ustr_ustr(text, title);
 			}
 		}
 		template<class T = bool>
 		void Logs(Ustr& text, Ustr&& title)
 		{
-			if (ShowLog)
-			{
 #ifdef _DEBUG
-				Logs_ustr_ustr(text, title);
-				return;
+			Logs_ustr_ustr(text, title);
+			return;
 #endif
-				if (Release)
-				{
-					Logs_ustr_ustr(text, title);
-				}
+			if (Release)
+			{
+				Logs_ustr_ustr(text, title);
 			}
 		}
 		template<class T = bool>
 		void Logs(Ustr&& text, Ustr& title)
 		{
-			if (ShowLog)
-			{
 #ifdef _DEBUG
-				Logs_ustr_ustr(text, title);
-				return;
+			Logs_ustr_ustr(text, title);
+			return;
 #endif
-				if (Release)
-				{
-					Logs_ustr_ustr(text, title);
-				}
+			if (Release)
+			{
+				Logs_ustr_ustr(text, title);
 			}
 		}
-
+		
 		template<class T = bool>
 		void Logs(Ustr& text, LogMessage lgm)
 		{
-			if (ShowLog)
-			{
 #ifdef _DEBUG
-				Logs_ustr(text, lgm);
-				return;
+			Logs_ustr(text, lgm);
+			return;
 #endif
-				if (Release)
-				{
-					Logs_ustr(text, lgm);
-				}
+			if (Release)
+			{
+				Logs_ustr(text, lgm);
 			}
 		}
 		template<class T = bool>
 		void Logs(Ustr&& text, LogMessage lgm)
 		{
-			if (ShowLog)
-			{
 #ifdef _DEBUG
-				Logs_ustr(text, lgm);
-				return;
+			Logs_ustr(text, lgm);
+			return;
 #endif
-				if (Release)
-				{
-					Logs_ustr(text, lgm);
-				}
+			if (Release)
+			{
+				Logs_ustr(text, lgm);
 			}
 		}
 		template<class T = bool>
 		void Logs(LogMessage lgm)
 		{
-			if (ShowLog)
-			{
 #ifdef _DEBUG
-				Logs_lgm(lgm);
-				return;
+			Logs_lgm(lgm);
+			return;
 #endif
-				if (Release)
-				{
-					Logs_lgm(lgm);
-				}
+			if (Release)
+			{
+				Logs_lgm(lgm);
 			}
 		}
 
@@ -683,39 +708,68 @@ namespace Tools_Tool
 		template<class T = bool>
 		void operator()(Ustr& text, Ustr& title)
 		{
-			Logs(text, title);
+			Init();
+			if (ShowLog)
+			{
+				Logs(text, title);
+			}
 		}
 		template<class T = bool>
 		void operator()(Ustr&& text, Ustr&& title)
 		{
-			Logs(text, title);
+			Init();
+			if (ShowLog)
+			{
+				Logs(text, title);
+			}
 		}
 		template<class T = bool>
 		void operator()(Ustr& text, Ustr&& title)
 		{
-			Logs(text, title);
+			Init();
+			if (ShowLog)
+			{
+				Logs(text, title);
+			}
 		}
 		template<class T = bool>
 		void operator()(Ustr&& text, Ustr& title)
 		{
-			Logs(text, title);
+			Init();
+			if (ShowLog)
+			{
+				Logs(text, title);
+			}
 		}
 		template<class T = bool>
 		void operator()(Ustr& text, LogMessage lgm = lgm::ts)
 		{
-			Logs(text, lgm);
+			Init();
+			if (ShowLog)
+			{
+				Logs(text, lgm);
+			}
 		}
 		template<class T = bool>
 		void operator()(Ustr&& text, LogMessage lgm = lgm::ts)
 		{
-			Logs(text, lgm);
+			Init();
+			if (ShowLog)
+			{
+				Logs(text, lgm);
+			}
 		}
 		template<class T = bool>
 		void operator()(LogMessage lgm = lgm::nl)
 		{
-			Logs(lgm);
+			Init();
+			if (ShowLog)
+			{
+				Logs(lgm);
+			}
 		}
 	};
+
 
 	//模式 mode: _DEBUG & (_CONSOLE | _WINDOWS)
 	static Log lg(false, false);
@@ -725,6 +779,7 @@ namespace Tools_Tool
 	static Log lgr(true, false);
 	//模式 mode: #ifndef _DEBUG(Release) & _CONSOLE
 	static Log lgcr(true, true);
+
 
 	template<class Temp = bool>
 	void README()
@@ -787,13 +842,8 @@ namespace Tools_Tool
 		lgc(TEXT("\tTools_Tool::Log::SetShowLog(bool)"), lgm::nl);
 		lgc(TEXT("\tTools_Tool::Log::SetConsoleTimeShow(bool)"), lgm::nl);
 	}
-
-	void SetShowLog(bool showLog);
-#define 设置日志显示 SetShowLog
-	void SetConsoleTimeShow(bool show);
-#define 设置时间显示 SetConsoleTimeShow
-
 #define 使用说明 README
+
 }
 
 

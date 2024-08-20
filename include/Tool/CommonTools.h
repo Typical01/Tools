@@ -7,7 +7,6 @@
 #include "Tools_Tool.h"
 #include "Log.h"
 #include "Timers.h"
-#include "StringConversion.h"
 
 #include <Windows.h>
 
@@ -23,41 +22,6 @@ namespace Tools_Tool {
 	//Windows系统操作----------------------------------------------------------------------------------------
 	namespace WindowsSystem
 	{
-		class TOOLS_TOOL_API ShellMessage
-		{
-		private:
-			std::wstring 信息;
-			int ErrorCode; //错误代码
-			bool Status; //是否成功
-
-		public:
-			ShellMessage(std::wstring Shell信息)
-				: 信息(Shell信息), ErrorCode(0), Status(false)
-			{}
-
-			void operator=(int message);
-
-			//错误代码
-			int GetErrorCode();
-
-			//是否成功
-			bool isSucceed();
-		};
-
-		class TOOLS_TOOL_API RegisterHotKeyMessage
-		{
-		private:
-			std::wstring 信息;
-
-		public:
-			RegisterHotKeyMessage(std::wstring RegisterHotKey热键信息)
-				: 信息(RegisterHotKey热键信息)
-			{}
-
-			void operator=(int message);
-		};
-		typedef ShellMessage Shell消息;
-		typedef RegisterHotKeyMessage 热键注册消息;
 
 		//显示--------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +38,7 @@ namespace Tools_Tool {
 		TOOLS_TOOL_API void StartFile(const wchar_t* filePath);
 
 		//获取程序ID
-		TOOLS_TOOL_API DWORD FindProcessIDByName(const std::string& processName);
+		TOOLS_TOOL_API DWORD FindProcessIDByName(Ustr& processName);
 
 		//获取程序PID
 		TOOLS_TOOL_API long GetProcessIdFromName(const char* name);
@@ -96,10 +60,36 @@ namespace Tools_Tool {
 		* CoInitialize(0);
 		* CreateLink(...);
 		* CoUninitialize(); */
-		TOOLS_TOOL_API HRESULT CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszPathLink, 
-			LPCWSTR lpszIcon = NULL, LPCWSTR lpszDesc = NULL, LPCWSTR lpszArgs = NULL);
+		TOOLS_TOOL_API HRESULT CreateLink(LPCWSTR 对象路径, LPCWSTR 对象名, 
+			LPCWSTR 图标路径 = NULL, LPCWSTR 快捷方式描述 = NULL, LPCWSTR 目标程序的参数 = NULL);
 
 		//文件操作---------------------------------------------------------------------------------------------------------
+		
+		// Test.exe
+		// ProgramName: Test
+		// ProgramSuffixName: .exe
+		template<class T = bool>
+		Ustr GetProgramPath(Ustr ProgramName, Ustr ProgramSuffixName)
+		{
+			Uchar 程序路径[MAX_PATH] = TEXT("");
+			//Ustr 程序全路径 = TEXT("");
+			
+			//获取当前程序的全路径
+			GetModuleFileName(NULL, 程序路径, MAX_PATH);
+			Ustr 程序全路径 = 程序路径;
+
+			auto tempSuffixSize = ((Ustr)ProgramName + TEXT("\\") + ProgramSuffixName).size();
+			auto tempProgramFolderSize = 程序全路径.size() - tempSuffixSize;
+
+			std::wstring temp程序父文件夹_路径名(L" ", tempProgramFolderSize);
+			for (int i = 0; i < tempProgramFolderSize; i++)
+			{
+				temp程序父文件夹_路径名[i] = 程序全路径[i];
+			}
+
+			return temp程序父文件夹_路径名;
+		}
+#define Get程序所在路径 GetProgramPath
 
 		//创建文件
 		TOOLS_TOOL_API void CreateFiles(const string& FilePath);
@@ -135,7 +125,7 @@ namespace Tools_Tool {
 
 		//字符转换-------------------------------------------------------------------------------------------------------
 		//std::string 转 std::wstring(宽字符)
-		TOOLS_TOOL_API std::wstring StringToWstring(const std::string& str);
+		TOOLS_TOOL_API std::wstring StringToWstring(const std::string str);
 #define stow StringToWstring
 		TOOLS_TOOL_API std::string WstringToString(std::wstring wstr);
 #define wtos WstringToString

@@ -50,7 +50,12 @@ namespace Tools_Tool {
 				: 区域设置_总数(0)
 			{
 			}
-			CharHandleOfConfigFile(const wchar_t* 传入配置文件路径, bool 解析 = true)
+			CharHandleOfConfigFile(Ustr& 传入配置文件路径, bool 解析 = true)
+				: 区域设置_总数(0)
+			{
+				Init(传入配置文件路径, 解析);
+			}
+			CharHandleOfConfigFile(Ustr&& 传入配置文件路径, bool 解析 = true)
 				: 区域设置_总数(0)
 			{
 				Init(传入配置文件路径, 解析);
@@ -59,7 +64,8 @@ namespace Tools_Tool {
 
 		public:
 			// 初始化
-			bool Init(const wchar_t* 传入配置文件路径, bool 解析 = true);
+			bool Init(Ustr& 传入配置文件路径, bool 解析 = true);
+			bool Init(Ustr&& 传入配置文件路径, bool 解析 = true);
 
 			// 获取 指定区域中所有的内容
 			std::map<std::wstring, std::wstring> Get指定区域内容(const wchar_t* 传入区域设置) const;
@@ -81,9 +87,11 @@ namespace Tools_Tool {
 			void 修改区域(const wchar_t* 传入区域设置, const wchar_t* 传入区域内容键, const wchar_t* 传入区域内容值);
 
 			// 将格式化后的配置文件内容写入 指定的文件
-			bool 写入文件();
+			bool 写入文件(Ustr fopenMode = L"w+");
 			// 将格式化后的配置文件内容写入 指定的文件
-			bool 写入文件(const wchar_t* 传入配置文件路径);
+			bool 写入文件(Ustr 传入配置文件路径, Ustr fopenMode = L"w+");
+			bool 写入文件(std::vector<Ustr>& 传入文本内容, Ustr fopenMode = L"w+");
+			static bool 写入文件(Ustr 传入配置文件路径, std::vector<Ustr>& 传入文本内容, Ustr fopenMode = L"w+");
 
 			//只用于创建 UTF-8 BOM文件
 			bool 创建文件();
@@ -111,7 +119,7 @@ namespace Tools_Tool {
 		public:
 			void test();
 		};
-
+		using CfgFile = CharHandleOfConfigFile;
 	}
 }
 namespace 工具库 = Tools_Tool;
