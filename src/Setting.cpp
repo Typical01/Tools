@@ -12,66 +12,44 @@ int Windows程序启动项()
 {
     lgcr(L"Windows程序启动项()");
 
-    //设置DPI
     WindowHosting::WindowDPI();
-
-    //单实例程序
     if (WindowHosting::单实例运行(Tools.程序_窗口类名, Tools.程序_标题栏名) == 0) {
         return 0;
     }
 
     Tools.工具箱配置文件.初始化(Tools.程序_名);
+    打开配置文件();
     UpdateConfig();
 
     if (Tools.设置_开机自启动 == L"否") {
-        if (SetAutoRun(L"典型一号的工具箱", Tools.工具箱配置文件.Get程序路径().c_str())) {
-            auto temp = Tools.工具箱配置文件.Get基本设置内容();
-            if (temp.find(L"注册表开机自启动") != temp.cend()) {
-                temp[L"注册表开机自启动"] = L"是";
-                lgc(temp.find(L"注册表开机自启动")->first + L"=" + temp.find(L"注册表开机自启动")->second, lgm::wr);
-            }
-            std::vector<Ustr> tempSetting;
-            tempSetting.push_back(L"[基本设置]\n");
-            for (auto temp内容 = temp.cbegin(); temp内容 != temp.cend(); temp内容++) {
-                auto tempStr = temp内容->first + L"=" + temp内容->second + L"\n";
-                tempSetting.push_back(tempStr);
-                lgc(tempStr, lgm::wr);
-            }
+        //开机自启动 设置修改为开关, 而不是状态(根据当前状态: 否为没有注册, 则注册并改为是
 
-            lgc(L"注册表修改后的配置文件");
-            CfgFile::写入文件(Tools.工具箱配置文件.Get工具箱配置文件路径(), tempSetting);
-            lgr(L"注册开机自启动: 典型一号的工具箱");
-        }
+        //if (SetAutoRun(L"典型一号的工具箱", Tools.工具箱配置文件.Get程序路径().c_str())) {
+
+        //    //通过 配置文件对象进行修改
+        //    if (Tools.基本设置内容.find(L"注册表开机自启动") != Tools.基本设置内容.cend()) {
+        //        //注册开机自启后, 修改配置文件中的设置项
+        //        Tools.配置文件.修改区域(L"基本设置", L"注册表开机自启动", L"是");
+        //        UpdateConfig();
+        //        lgc(Tools.基本设置内容.find(L"注册表开机自启动")->first + L"=" + Tools.基本设置内容.find(L"注册表开机自启动")->second, lgm::wr);
+        //    }
+
+        //    lgc(L"注册表修改后的配置文件");
+        //    Tools.配置文件.写入文件();
+        //    lgr(L"注册开机自启动: 典型一号的工具箱");
+        //}
     }
-
-        /*if (!IsUserAdmin()) {
-            lgr(L"稍后会弹出: \n  获取管理员权限的窗口\n  选择确定获取后自动注册开机自启动\n  选择取消不会注册");
-            if (WindowHosting::获取管理员权限(true)) {
-                return 0;
-            }
+    else if (Tools.设置_开机自启动 == L"是") { //
+        if (SetAutoRun(L"典型一号的工具箱", Tools.工具箱配置文件.Get程序路径().c_str())) {
+            lgc(L"典型一号的工具箱注册开机自启动 成功!", lgm::wr);
         }
         else {
-            if (SetAutoRun(L"典型一号的工具箱", Tools.工具箱配置文件.Get程序路径().c_str())) {
-                auto temp = Tools.工具箱配置文件.Get基本设置内容();
-                if (temp.find(L"注册表开机自启动") != temp.cend()) {
-                    temp[L"注册表开机自启动"] = L"是";
-                    lgc(temp.find(L"注册表开机自启动")->first + L"=" + temp.find(L"注册表开机自启动")->second, lgm::wr);
-                }
-                std::vector<Ustr> tempSetting;
-                tempSetting.push_back(L"[基本设置]\n");
-                for (auto temp内容 = temp.cbegin(); temp内容 != temp.cend(); temp内容++) {
-                    auto tempStr = temp内容->first + L"=" + temp内容->second + L"\n";
-                    tempSetting.push_back(tempStr);
-                    lgc(tempStr, lgm::wr);
-                }
-                
-                lgc(L"注册表修改后的配置文件");
-                CfgFile::写入文件(Tools.工具箱配置文件.Get工具箱配置文件路径(), tempSetting);
-                lgr(L"注册开机自启动: 典型一号的工具箱");
-            }*/
+            lgc(L"典型一号的工具箱注册开机自启动 失败!", lgm::er);
+        }
+    }
+    初始化();
 
     Tools.Icon = (LPWSTR)IDI_ICON256X;
-
     Tools.hIns = GetModuleHandle(NULL);
 
     HFONT Font = CreateFont(
@@ -84,7 +62,7 @@ int Windows程序启动项()
         FF_DONTCARE,
         TEXT("微软雅黑")
     );
-    Tools.WinHost.设置字体(Font);
+    Tools.wh.设置字体(Font);
     
     return 1;
 }
@@ -95,9 +73,6 @@ void Windows窗口类注册()
     lgcr(L"Windows窗口类注册()");
 
     WNDCLASS wndclass = { 0 };
-    WNDCLASS wndclass_设置窗口 = { 0 };
-    WNDCLASS wndclass_标签窗口 = { 0 };
-
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndProc;
     wndclass.cbClsExtra = 0;
@@ -108,32 +83,23 @@ void Windows窗口类注册()
     wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wndclass.lpszMenuName = NULL;
     wndclass.lpszClassName = Tools.程序_窗口类名;
+    Tools.wh.注册窗口类(wndclass);
 
-    /*wndclass_设置窗口.style = CS_HREDRAW | CS_VREDRAW;
-    wndclass_设置窗口.lpfnWndProc = SettingWndProc;
-    wndclass_设置窗口.cbClsExtra = 0;
-    wndclass_设置窗口.cbWndExtra = 0;
-    wndclass_设置窗口.hInstance = Tools.hIns;
-    wndclass_设置窗口.hIcon = LoadIcon(Tools.hIns, Tools.Icon);
-    wndclass_设置窗口.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wndclass_设置窗口.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wndclass_设置窗口.lpszMenuName = NULL;
-    wndclass_设置窗口.lpszClassName = Tools.程序_设置窗口类名;
+    WNDCLASS wndclass_标签 = { 0 };
+    wndclass_标签.style = CS_HREDRAW | CS_VREDRAW;
+    wndclass_标签.lpfnWndProc = TipsWndProc;
+    wndclass_标签.cbClsExtra = 0;
+    wndclass_标签.cbWndExtra = 0;
+    wndclass_标签.hInstance = Tools.hIns;
+    wndclass_标签.hIcon = LoadIcon(Tools.hIns, Tools.Icon);
+    wndclass_标签.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndclass_标签.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wndclass_标签.lpszMenuName = NULL;
+    wndclass_标签.lpszClassName = Tools.程序_标签窗口类名;
+    Tools.wh.注册窗口类(wndclass_标签);
 
-    wndclass_标签窗口.style = CS_HREDRAW | CS_VREDRAW;
-    wndclass_标签窗口.lpfnWndProc = TipsWndProc;
-    wndclass_标签窗口.cbClsExtra = 0;
-    wndclass_标签窗口.cbWndExtra = 0;
-    wndclass_标签窗口.hInstance = Tools.hIns;
-    wndclass_标签窗口.hIcon = LoadIcon(Tools.hIns, Tools.Icon);
-    wndclass_标签窗口.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wndclass_标签窗口.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wndclass_标签窗口.lpszMenuName = NULL;
-    wndclass_标签窗口.lpszClassName = Tools.程序_标签窗口类名;*/
+    WinHost::注册进度条窗口类();
 
-    Tools.WinHost.注册窗口类(wndclass);/*
-    Tools.WinHost.注册窗口类(wndclass_设置窗口);
-    Tools.WinHost.注册窗口类(wndclass_标签窗口);*/
 }
 
 void Windows窗口创建()
@@ -169,7 +135,9 @@ void Windows窗口创建()
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         NULL, NULL, Tools.hIns, NULL);
-    Tools.WinHost.添加窗口托管(L"hWnd_托盘", Tools.hWnd_托盘);
+    Tools.wh.添加窗口托管(L"hWnd_托盘", Tools.hWnd_托盘);
+
+    Tools.we.创建标签窗口(Tools.程序_标签窗口类名, Tools.wh);
 
     // 不要修改TaskbarCreated，这是系统任务栏自定义的消息  
     Tools.WM_TASKBARCREATED = RegisterWindowMessage(L"TaskbarCreated");
@@ -177,7 +145,7 @@ void Windows窗口创建()
 
 void 初始化()
 {
-    lgcr(L"窗口创建后: 初始化()");
+    lgcr(L"初始化()");
 
     UpdateConfig();
 
@@ -196,16 +164,134 @@ void 初始化()
     Tools.菜单_修改分辨率 = WindowHotkey::GetHotkey();
     Tools.菜单_打开Repos = WindowHotkey::GetHotkey();
     Tools.菜单_打开Lib = WindowHotkey::GetHotkey();
+    Tools.标签_打开 = WindowHotkey::GetHotkey();
+    //Tools.标签_切换状态 = WindowHotkey::GetHotkey();
 
-    热键注册消息 热键注册_F9(L"Ctrl + Alt + F9", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_修改分辨率, MOD_CONTROL | MOD_ALT, VK_F9));
-    热键注册消息 热键注册_F10(L"Ctrl + Alt + F10", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Repos, MOD_CONTROL | MOD_ALT, VK_F10));
-    热键注册消息 热键注册_F11(L"Ctrl + Alt + F11", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Lib, MOD_CONTROL | MOD_ALT, VK_F11));
+    热键注册消息 热键注册_修改分辨率(L"Ctrl + Alt + F9", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_修改分辨率, MOD_CONTROL | MOD_ALT, VK_F9));
+    热键注册消息 热键注册_打开Repos(L"Ctrl + Alt + F10", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Repos, MOD_CONTROL | MOD_ALT, VK_F10));
+    热键注册消息 热键注册_打开Lib(L"Ctrl + Alt + F11", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Lib, MOD_CONTROL | MOD_ALT, VK_F11));
+    热键注册消息 热键注册_打开标签(L"Ctrl + ~", RegisterHotKey(Tools.hWnd_托盘, Tools.标签_打开, MOD_CONTROL, VK_OEM_3));
+    //热键注册消息 热键注册_标签(L"Ctrl + `", RegisterHotKey(Tools.hWnd_托盘, Tools.标签_切换状态, MOD_CONTROL, VK_OEM_3));
 
-    //命令符 修改 nv显卡频率为 1080Mhz
-    if (Tools.设置_Nvidia == L"开") {
-        WindowShell::执行(L"nvidia-smi", L"runas", L"cmd", L"nvidia-smi -lgc 1080", 0);
+    std::vector<ShellConfig> shellConfig;
+    auto temp配置全文件内容 = Tools.配置文件.Get配置文件全内容();
+    for (auto temp区域设置 = temp配置全文件内容.cbegin(); temp区域设置 != temp配置全文件内容.cend(); temp区域设置++) {
+        const Ustr 区域名称 = temp区域设置->first;
+        auto temp无效配置 = temp区域设置->second.cend();
+        std::map<Ustr, Ustr>::const_iterator temp迭代器;
+
+        //执行Shell配置
+        if (区域名称 != L"基本设置" && 区域名称 != L"标签") {
+            Ustr temp程序启动时运行;
+            Ustr 模式;
+            Ustr 文件;
+            Ustr 参数;
+            Ustr temp显示窗口;
+
+            temp迭代器 = temp区域设置->second.find(L"程序启动时运行");
+            if (temp无效配置 != temp迭代器) {
+                temp程序启动时运行 = temp迭代器->second;
+                lgc();
+            }
+            temp迭代器 = temp区域设置->second.find(L"模式");
+            if (temp无效配置 != temp迭代器) {
+                模式 = temp迭代器->second;
+            }
+            temp迭代器 = temp区域设置->second.find(L"文件");
+            if (temp无效配置 != temp迭代器) {
+                文件 = temp迭代器->second;
+            }
+            temp迭代器 = temp区域设置->second.find(L"参数");
+            if (temp无效配置 != temp迭代器) {
+                参数 = temp迭代器->second;
+            }
+            temp迭代器 = temp区域设置->second.find(L"显示窗口");
+            if (temp无效配置 != temp迭代器) {
+                temp显示窗口 = temp迭代器->second;
+            }
+
+            bool 程序启动时运行 = false;
+            if (temp程序启动时运行 == L"是") {
+                程序启动时运行 = true;
+            }
+            bool 显示窗口 = false;
+            if (temp显示窗口 == L"是") {
+                显示窗口 = true;
+            }
+
+            ShellConfig tempShellConfig(区域名称, 程序启动时运行, 模式, 文件, 参数, 显示窗口);
+            shellConfig.push_back(tempShellConfig);
+        }
     }
-    }       
+    Tools.ws.Shell处理(Tools.hMenu, shellConfig);
+
+    //标签
+    Tools.we.Init(Tools.配置文件);
+}
+
+void 打开配置文件()
+{
+    //先创建文件夹(否则后面的文件不能创建): \\Tools\\config
+    if (WindowsSystem::CreateFolder(Tools.工具箱配置文件.Get程序父文件夹路径() + L"\\config")) {
+        //文件不存在时，创建
+        if (!Tools.配置文件.Init(Tools.工具箱配置文件.Get工具箱配置文件路径()))
+        {
+            std::vector<Ustr> 区域内容;
+            区域内容.push_back(L"原本屏幕分辨率宽=1920");
+            区域内容.push_back(L"原本屏幕分辨率高=1080");
+            区域内容.push_back(L"修改的屏幕分辨率宽=1280");
+            区域内容.push_back(L"修改的屏幕分辨率高=1024");
+            区域内容.push_back(L"Repos=C:\\Users\\22793\\source\\repos");
+            区域内容.push_back(L"Lib=C:\\Typical\\ProgramProject\\C++\\Libs");
+            区域内容.push_back(L"笔记本键盘开关状态=开");
+            区域内容.push_back(L"注册表开机自启动=否");
+
+            /*std::vector<Ustr> 标签区域内容;
+            标签区域内容.push_back(L"标签1=" + Tools.工具箱配置文件.Get程序父文件夹路径() + L"\\config" + L"\\标签1.txt");*/
+
+            std::vector<Ustr> nv_smi;
+            nv_smi.push_back(L"程序启动时运行=否");
+            nv_smi.push_back(L"模式=管理员运行");
+            nv_smi.push_back(L"文件=cmd");
+            nv_smi.push_back(L"参数=nvidia-smi -lgc 1080");
+            nv_smi.push_back(L"显示窗口=否");
+            std::vector<Ustr> ping_baidu;
+            ping_baidu.push_back(L"程序启动时运行=否");
+            ping_baidu.push_back(L"模式=打开文件");
+            ping_baidu.push_back(L"文件=cmd");
+            ping_baidu.push_back(L"参数=/k ping -t www.baidu.com");
+            ping_baidu.push_back(L"显示窗口=是");
+
+            Tools.配置文件.添加区域(L"基本设置", 区域内容);
+            /*Tools.配置文件.添加区域(L"标签", 标签区域内容);*/
+            Tools.配置文件.添加区域(L"nvidia-smi 1080", nv_smi);
+            Tools.配置文件.添加区域(L"ping baidu", ping_baidu);
+            Tools.配置文件.写入文件();
+
+            Tools.基本设置内容 = Tools.配置文件.Get指定区域内容(L"基本设置");
+            Tools.配置文件全内容 = Tools.配置文件.Get配置文件全内容();
+        }
+        else //文件存在
+        {
+            Tools.基本设置内容 = Tools.配置文件.Get指定区域内容(L"基本设置");
+            Tools.配置文件全内容 = Tools.配置文件.Get配置文件全内容();
+        }
+    }
+}
+
+void 菜单生成(HMENU 菜单)
+{
+    //为菜单添加选项  
+    AppendMenu(菜单, MF_STRING, Tools.ID_标签, TEXT("标签"));
+    AppendMenu(菜单, MF_SEPARATOR, NULL, TEXT("分割线"));
+    AppendMenu(菜单, MF_STRING, Tools.ID_笔记本键盘开关, TEXT("笔记本键盘开关"));
+    AppendMenu(菜单, MF_STRING, Tools.ID_修改屏幕分辨率, TEXT("修改屏幕分辨率"));
+    //AppendMenu(菜单, MF_STRING, Tools.ID_Ping, TEXT("Ping"));
+    AppendMenu(菜单, MF_SEPARATOR, NULL, TEXT("分割线"));
+    AppendMenu(菜单, MF_STRING, Tools.ID_工具箱设置, TEXT("配置"));
+    AppendMenu(菜单, MF_STRING, Tools.ID_帮助, TEXT("帮助"));
+    AppendMenu(菜单, MF_STRING, Tools.ID_退出, TEXT("退出"));
+}
 
 void 菜单选择(int 菜单选项ID)
 {
@@ -213,53 +299,15 @@ void 菜单选择(int 菜单选项ID)
     {
         lgc(L"ID_工具箱设置", L"菜单选项ID");
 
-#if 0
-        //设置窗口
-        Tools.hWnd_设置 = CreateWindowEx(0,
-            Tools.程序_窗口类名, Tools.程序_标题栏名_设置窗口,
-            WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT,
-            CW_USEDEFAULT,
-            600,
-            400,
-            NULL, NULL, Tools.hIns, NULL);
-        SetWindowLongPtr(Tools.hWnd_设置, GWLP_WNDPROC, (LONG_PTR)SettingWndProc);
-        Tools.WinHost.添加窗口托管(L"hWnd_设置", Tools.hWnd_设置);
-#endif
         Tools.工具箱配置文件.打开配置文件();
         lgr(L"修改后需要重启程序!");
     }
-#if 0
     if (菜单选项ID == Tools.ID_标签)
     {
         lgc(L"ID_标签", L"菜单选项ID");
 
-        Tools.hWnd_标签 = CreateWindowEx(NULL,
-            Tools.程序_窗口类名, Tools.程序_标题栏名_标签窗口,
-            WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT,
-            CW_USEDEFAULT,
-            550,
-            300,
-            NULL, NULL, Tools.hIns, NULL);
-        SetWindowLongPtr(Tools.hWnd_标签, GWLP_WNDPROC, (LONG_PTR)TipsWndProc);
-        Tools.WinHost.添加窗口托管(L"hWnd_标签", Tools.hWnd_标签);
-
-        Tools.标签菜单_Add = WinHost::GetHMENU();
-        Tools.标签菜单_Set = WinHost::GetHMENU();
-        Tools.标签菜单_Del = WinHost::GetHMENU();
-        Tools.标签菜单_Setting = WinHost::GetHMENU();
-        Tools.标签菜单_Help = WinHost::GetHMENU();
-
-        HMENU hMain = CreateMenu();
-        AppendMenu(hMain, MF_POPUP, Tools.标签菜单_Add, __TEXT("增加"));
-        AppendMenu(hMain, MF_POPUP, Tools.标签菜单_Set, __TEXT("修改"));
-        AppendMenu(hMain, MF_POPUP, Tools.标签菜单_Del, __TEXT("删除"));
-        AppendMenu(hMain, MF_POPUP, Tools.标签菜单_Setting, __TEXT("设置"));
-        AppendMenu(hMain, MF_POPUP, Tools.标签菜单_Help, __TEXT("帮助"));
-        SetMenu(Tools.hWnd_标签, hMain);
+        Tools.we.显示标签窗口(true);
     }
-#endif
     if (菜单选项ID == Tools.ID_笔记本键盘开关)
     {
         Shell消息 temp;
@@ -318,13 +366,14 @@ void 菜单选择(int 菜单选项ID)
 \t      4:3  1280x960\n\n快捷键:\
 \tCtrl + Alt + F9: 修改分辨率\n\
 \tCtrl + Alt + F10: 打开 Repos 文件夹\n\
-\tCtrl + Alt + F11: 打开 Lib 文件夹", L"快捷键帮助");
+\tCtrl + Alt + F11: 打开 Lib 文件夹\n\
+\tCtrl + ~: 打开/关闭标签", L"快捷键帮助");
     }
-    if (菜单选项ID == Tools.ID_Ping)
+    /*if (菜单选项ID == Tools.ID_Ping)
     {
         lgc(L"ID_Ping", L"菜单选项ID");
         WindowShell::执行(L"Ping", L"open", L"cmd", L"/k ping -t www.baidu.com");
-    }
+    }*/
 
     if (菜单选项ID == Tools.ID_退出)
     {
@@ -337,21 +386,24 @@ void UpdateConfig()
 {
     lgcr(L"UpdateConfig()");
 
-    Tools.设置_原屏幕分辨率宽 = Tools.工具箱配置文件.Get基本设置内容().find(L"原本屏幕分辨率宽")->second;
+    Tools.基本设置内容 = Tools.配置文件.Get指定区域内容(L"基本设置");
+    Tools.配置文件全内容 = Tools.配置文件.Get配置文件全内容();
+
+    Tools.设置_原屏幕分辨率宽 = Tools.基本设置内容.find(L"原本屏幕分辨率宽")->second;
     lgc(L"find: 原本屏幕分辨率宽: " + Tools.设置_原屏幕分辨率宽, lgm::wr);
-    Tools.设置_原屏幕分辨率高 = Tools.工具箱配置文件.Get基本设置内容().find(L"原本屏幕分辨率高")->second;
+    Tools.设置_原屏幕分辨率高 = Tools.基本设置内容.find(L"原本屏幕分辨率高")->second;
     lgc(L"find: 原本屏幕分辨率高: " + Tools.设置_原屏幕分辨率高, lgm::wr);
-    Tools.设置_修改屏幕分辨率宽 = Tools.工具箱配置文件.Get基本设置内容().find(L"修改的屏幕分辨率宽")->second;
+    Tools.设置_修改屏幕分辨率宽 = Tools.基本设置内容.find(L"修改的屏幕分辨率宽")->second;
     lgc(L"find: 修改的屏幕分辨率宽: " + Tools.设置_修改屏幕分辨率宽, lgm::wr);
-    Tools.设置_修改屏幕分辨率高 = Tools.工具箱配置文件.Get基本设置内容().find(L"修改的屏幕分辨率高")->second;
+    Tools.设置_修改屏幕分辨率高 = Tools.基本设置内容.find(L"修改的屏幕分辨率高")->second;
     lgc(L"find: 修改的屏幕分辨率高: " + Tools.设置_修改屏幕分辨率高, lgm::wr);
-    Tools.设置_笔记本键盘开关状态 = Tools.工具箱配置文件.Get基本设置内容().find(L"笔记本键盘开关状态")->second;
+    Tools.设置_笔记本键盘开关状态 = Tools.基本设置内容.find(L"笔记本键盘开关状态")->second;
     lgc(L"find: 笔记本键盘开关状态: " + Tools.设置_笔记本键盘开关状态, lgm::wr);
-    Tools.设置_Repos = Tools.工具箱配置文件.Get基本设置内容().find(L"Repos")->second;
+    Tools.设置_Repos = Tools.基本设置内容.find(L"Repos")->second;
     lgc(L"find: 设置_Repos: " + Tools.设置_Repos, lgm::wr);
-    Tools.设置_Lib = Tools.工具箱配置文件.Get基本设置内容().find(L"Lib")->second;
+    Tools.设置_Lib = Tools.基本设置内容.find(L"Lib")->second;
     lgc(L"find: 设置_Lib: " + Tools.设置_Lib, lgm::wr);
-    Tools.设置_开机自启动 = Tools.工具箱配置文件.Get基本设置内容().find(L"注册表开机自启动")->second;
+    Tools.设置_开机自启动 = Tools.基本设置内容.find(L"注册表开机自启动")->second;
     lgc(L"find: 设置_开机自启动: " + Tools.设置_开机自启动, lgm::wr);
 }
 
@@ -383,16 +435,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         Tools.hMenu = CreatePopupMenu(); //生成菜单
 
-        //为菜单添加选项  
-        AppendMenu(Tools.hMenu, MF_STRING, Tools.ID_工具箱设置, TEXT("配置"));
-        //AppendMenu(Tools.hMenu, MF_STRING, Tools.ID_标签, TEXT("标签"));
-        AppendMenu(Tools.hMenu, MF_SEPARATOR, NULL, TEXT("分割线"));
-        AppendMenu(Tools.hMenu, MF_STRING, Tools.ID_笔记本键盘开关, TEXT("笔记本键盘开关"));
-        AppendMenu(Tools.hMenu, MF_STRING, Tools.ID_修改屏幕分辨率, TEXT("修改屏幕分辨率"));
-        AppendMenu(Tools.hMenu, MF_STRING, Tools.ID_Ping, TEXT("Ping"));
-        AppendMenu(Tools.hMenu, MF_SEPARATOR, NULL, TEXT("分割线"));
-        AppendMenu(Tools.hMenu, MF_STRING, Tools.ID_帮助, TEXT("帮助"));
-        AppendMenu(Tools.hMenu, MF_STRING, Tools.ID_退出, TEXT("退出"));
+        菜单生成(Tools.hMenu);
 
         //lgc(L"Shell_NotifyIcon之前 ErrorCode:" + std::to_wstring(GetLastError()), lgm::er);
         if (!Shell_NotifyIcon(NIM_ADD, &Tools.nid)) {
@@ -428,6 +471,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
 
             菜单选择(菜单选项ID);
+            Tools.ws.程序菜单项Shell(菜单选项ID);
             
             break;
         }
@@ -473,6 +517,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             Shell消息 temp(L"Lib", (int)ShellExecute(NULL, L"explore", Tools.设置_Lib.c_str(), NULL, NULL, SW_SHOWNORMAL));
         }
+        if (Tools.标签_打开 == wParam) {
+            Tools.we.显示标签窗口(true);
+        }
 
         break;
     }
@@ -498,56 +545,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-LRESULT SettingWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    switch (uMsg)
-    {
-    case WM_CREATE:
-    {
-        //确定按钮
-        Tools.确认按钮 = WindowHosting::GetHMENU();
-        Tools.hWnd_确认 = CreateWindowEx(0,
-            L"BUTTON", L"确认",
-            WS_VISIBLE | WS_CHILD,
-            600 - 180,
-            400 - 100,
-            60,
-            40,
-            hWnd, (HMENU)Tools.确认按钮, Tools.hIns, NULL);
-        Tools.WinHost.添加窗口托管(L"hWnd_确认", Tools.hWnd_确认);
-
-        //取消按钮
-        Tools.取消按钮 = WindowHosting::GetHMENU();
-        Tools.hWnd_取消 = CreateWindowEx(0,
-            L"BUTTON", L"取消",
-            WS_VISIBLE | WS_CHILD,
-            600 - 100,
-            400 - 100,
-            60,
-            40,
-            hWnd, (HMENU)Tools.取消按钮, Tools.hIns, NULL);
-        Tools.WinHost.添加窗口托管(L"hWnd_取消", Tools.hWnd_取消);
-
-        break;
-    }
-    default:
-        /*
-        * 防止当Explorer.exe 崩溃以后，程序在系统系统托盘中的图标就消失
-        *
-        * 原理：Explorer.exe 重新载入后会重建系统任务栏。当系统任务栏建立的时候会向系统内所有
-        * 注册接收TaskbarCreated 消息的顶级窗口发送一条消息，我们只需要捕捉这个消息，并重建系
-        * 统托盘的图标即可。
-        */
-        if (uMsg == Tools.WM_TASKBARCREATED) {
-            SendMessage(hWnd, WM_CREATE, wParam, lParam);
-        }
-
-        // 对于未处理的消息，默认处理
-        return DefWindowProc(hWnd, uMsg, wParam, lParam);
-    }
-    return 0;
-}
-#if 0
 LRESULT TipsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     int wmId, wmEvent;
@@ -560,211 +557,119 @@ LRESULT TipsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         wmEvent = HIWORD(wParam); //编辑控件通知代码 编辑控件的句柄
         //HWND temp = lParam; //编辑控件的句柄
 
-        switch (wmEvent)
-        {
-            ////更改选择时
-            //case LBN_SELCHANGE:
-            //{
-            //    lgc(std::to_wstring(SendMessage(hwnd3_ListBox, LB_GETCURSEL , 0, 0)).c_str(), L"ListBox");
-            //    lgc(std::to_wstring(SendMessage(hwnd3_ListBox2, LB_GETSELCOUNT, 0, 0)).c_str(), L"ListBox2");
-
-            //    break;
-            //}
-            //对列表项左键双击
-        case LBN_DBLCLK:
-        {
-            lgc(std::to_wstring(SendMessage(hwnd3_ListBox, LB_GETCURSEL, 0, 0)), L"ListBox");
-            lgc(std::to_wstring(SendMessage(hwnd3_ListBox2, LB_GETSELCOUNT, 0, 0)), L"ListBox2");
-
-            break;
-        }
-        case DL_BEGINDRAG:
-        {
-            lgc(std::to_wstring(SendMessage(hwnd3_ListBox, LB_GETCURSEL, 0, 0)).c_str(), L"ListBox");
-            lgc(std::to_wstring(SendMessage(hwnd3_ListBox2, LB_GETSELCOUNT, 0, 0)).c_str(), L"ListBox2");
-
-            break;
-        }
-        }
-
         //标签菜单
-        if (wmId == Tools.标签菜单_Add)
+        if (wmId == Tools.we.标签菜单_Add)
         {
-            SetName = false;
             lgc(L"增加", L"点击了");
-            CreateChildWindows();
-            SetWindowsSize();
+            Tools.标签_是否修改 = false;
+            Tools.we.显示命名窗口(true);
 
             break;
         }
-        if (wmId == Tools.标签菜单_Set)
+        if (wmId == Tools.we.标签菜单_Set)
         {
-            SetName = true;
             lgc(L"修改", L"点击了");
-            CreateChildWindows();
-            SetWindowsSize();
-
-            for (auto temp2 = hwndEditCount.begin(); temp2 != hwndEditCount.end(); temp2++)
-            {
-                if (temp2->second != NowEdit)
-                {
-                    lgc(std::to_wstring((int)temp2->second).c_str(), L"隐藏窗口");
-                    ShowWindow(temp2->second, SW_HIDE);
-                }
-            }
-            ShowWindow(NowEdit, SW_SHOW);
-            //SendMessage(hwndTabCtrl, TCM_SETCURFOCUS, (hwndEditCount.begin())->first, 0);
-            //SendMessage(NowEdit, EM_SETSEL, 0, -1); // 设置编辑控件的选区，全选文本
+            Tools.标签_是否修改 = true;
+            Tools.we.显示命名窗口(true);
 
             break;
         }
-        if (wmId == Tools.标签菜单_Del)
+        if (wmId == Tools.we.标签菜单_Del)
         {
             lgc(L"删除", L"点击了");
-            auto tempCount = SendMessage(hwndTabCtrl, TCM_GETITEMCOUNT, 0, 0);
-            if (tempCount > 1)
-            {
-                lgc(std::to_wstring(tempCount).c_str(), L"删除前的标签计数");
+            Tools.we.删除标签();
 
-                int tempIndex = SendMessage(hwndTabCtrl, TCM_GETCURSEL, 0, 0);
-
-                //找到对应的文本编辑框, 并销毁
-                auto temp = hwndEditCount.find(tempIndex);
-                if (temp != hwndEditCount.end())
-                {
-                    lgc(std::to_wstring((int)temp->second).c_str(), L"销毁 Edit 窗口");
-                    DestroyWindow(temp->second);
-                    SendMessage(hwndTabCtrl, TCM_DELETEITEM, tempIndex, 0);
-
-                    hwndEditCount.erase(tempIndex);
-                    lgc(std::to_wstring(tempIndex).c_str(), L"删除标签与对应的 Edit 句柄");
-                }
-
-
-                for (auto temp2 = hwndEditCount.begin(); temp2 != hwndEditCount.end(); temp2++)
-                {
-                    if (temp2->second != NowEdit)
-                    {
-                        lgc(std::to_wstring((int)temp2->second).c_str(), L"隐藏窗口");
-                        ShowWindow(temp2->second, SW_HIDE);
-                    }
-                }
-                ShowWindow(NowEdit, SW_SHOW);
-                //SendMessage(hwndTabCtrl, TCM_SETCURFOCUS, hwndEditCount.begin()->first, 0);
-                //SendMessage(NowEdit, EM_SETSEL, 0, -1); // 设置编辑控件的选区，全选文本
-            }
-
-            SetWindowsSize();
             break;
         }
-        if (wmId == Tools.标签菜单_Setting)
-        {
-            hWnd_Setting = CreateWindowEx(NULL,
-                程序_子窗口类名_设置, L"设置",
-                WS_OVERLAPPEDWINDOW,
-                CW_USEDEFAULT,
-                CW_USEDEFAULT,
-                550,
-                300,
-                NULL, NULL, hIns, NULL);
-            break;
-        }
-        if (wmId == Tools.标签菜单_Help) {
+        if (wmId == Tools.we.标签菜单_Help) {
             lg(L"呼出标签快捷键: Ctrl + `/~\n\
 透明标签快捷键: Shift + `/~", L"帮助");
 
             break;
         }
+        if (wmId == Tools.we.标签菜单_Save) {
+            Tools.we.标签内容保存(Tools.工具箱配置文件, Tools.配置文件);
+
+            break;
+        }
+
+        if (wmId == Tools.we.标签命名_确认按键) {
+            if (Tools.标签_是否修改) { //需要修改
+                Tools.we.修改标签();
+            }
+            else { //不需要, 添加
+                Tools.we.添加标签();
+            }
+            Tools.we.显示命名窗口(false);
+            Tools.we.标签窗口刷新();
+
+            break;
+        }
+
+        break;
     }
     case WM_NOTIFY: //WM_NOTIFY消息中，lParam是一个NMHDR结构，code字段是具体通知消息，hwndFrom是发出通知的窗口Handle
     {
         switch (((LPNMHDR)lParam)->code)
         {
-            //case TCN_SELCHANGING: //选项焦点即将改变
-            //{
-            //    int count = TabCtrl_GetCurSel(hwndTabCtrl);
-            //    lgc(std::to_wstring(count).c_str(), L"选项焦点即将改变");
-
-            //    ShowWindow(hwndEditCount.find(count)->second, SW_SHOWNORMAL);
-
-            //    //ShowWindow(Page[iPage], SW_HIDE);
-            //    break;
-            //}
+        //case TCN_SELCHANGING: //选项焦点即将改变
+        //{
+        //    break;
+        //}
         case TCN_SELCHANGE: //选项焦点已改变
         {
-            int count = TabCtrl_GetCurSel(hwndTabCtrl);
-            lgc(std::to_wstring(count).c_str(), L"选项焦点已改变");
+            lgc(L"选项已改变");
+            //Timers::sleep(2);
 
-            auto temp = hwndEditCount.find(count);
-            if (temp != hwndEditCount.end())
-            {
-                NowEdit = temp->second;
-                for (auto temp2 = hwndEditCount.begin(); temp2 != hwndEditCount.end(); temp2++)
-                {
-                    if (temp2->second != NowEdit)
-                    {
-                        lgc(std::to_wstring((int)temp2->second).c_str(), L"隐藏窗口");
-                        ShowWindow(temp2->second, SW_HIDE);
-                    }
-                }
-                ShowWindow(NowEdit, SW_SHOW);
-                lgc(std::to_wstring((int)temp->second).c_str(), L"显示窗口");
-            }
-            else
-            {
-                lgc(L"TCN_SELCHANGE", lgm::er);
-                lgc(std::to_wstring(hwndEditCount.size()).c_str(), L"TCN_SELCHANGE");
-            }
-
-            SetWindowsSize();
+            Tools.we.显示标签内容(Tools.we.Get标签名(Tools.we.Get当前标签选项()));
+            Tools.we.标签窗口刷新();
 
             break;
         }
-        case TCN_SELCHANGING://Tab改变前
-        {
-            int iPage = TabCtrl_GetCurSel(hwndTabCtrl);
-            auto temp = hwndEditCount.find(iPage)->second;
-            if (temp != NULL)
-            {
-                ShowWindow(temp, SW_HIDE);
-            }
-            return FALSE;
-        }
         }
         break;
     }
-    case WM_ACTIVATE:
-    {
-        if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE) {
-            Tools.标签_全选 = WindowHotkey::GetHotkey();
-            // 窗口被激活，注册快捷键  
-            热键注册消息 热键注册(L"Ctrl + A", RegisterHotKey(Tools.hWnd_标签, Tools.标签_全选, MOD_CONTROL, 'A'));
-        }
-        else {
-            // 窗口失活，注销快捷键  
-            UnregisterHotKey(Tools.hWnd_标签, Tools.标签_全选);
-            lgc(L"Ctrl + A", L"注销");
-        }
-        break;
-    }
-    case WM_HOTKEY:
-    {
-        if (wParam == Tools.标签_全选) {
-            // 处理Ctrl+A的快捷键  
-            lgc(L"Ctrl + A", L"按下");
-            SendMessage(Tools.hWnd_标签, EM_SETSEL, 0, -1);
-        }
-        break;
-    }
-    //case WM_CREATE:
+    //case WM_ACTIVATE:
     //{
-    //    //RegisterHotKey(hWnd, ID_SELECT_ALL, MOD_CONTROL, L'A');
+    //    if (LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE) {
+    //        Tools.标签_全选 = WindowHotkey::GetHotkey();
+    //        Tools.标签_保存 = WindowHotkey::GetHotkey();
+    //        // 窗口被激活，注册快捷键  
+    //        热键注册消息 热键注册_全选(L"Ctrl + A", RegisterHotKey(Tools.hWnd_标签, Tools.标签_全选, MOD_CONTROL, 'A'));
+    //        热键注册消息 热键注册_保存(L"Ctrl + S", RegisterHotKey(Tools.hWnd_标签, Tools.标签_保存, MOD_CONTROL, 'S'));
+    //    }
+    //    else {
+    //        // 窗口失活，注销快捷键  
+    //        UnregisterHotKey(Tools.hWnd_标签, Tools.标签_全选);
+    //        lgc(L"Ctrl + A", L"注销");
+    //        UnregisterHotKey(Tools.hWnd_标签, Tools.标签_保存);
+    //        lgc(L"Ctrl + S", L"注销");
+    //    }
+    //    break;
+    //}
+    //case WM_HOTKEY:
+    //{
+    //    if (wParam == Tools.标签_全选) {
+    //        // 处理Ctrl+A的快捷键  
+    //        lgc(L"Ctrl + A", L"按下");
+    //        SendMessage(Tools.hWnd_标签, EM_SETSEL, 0, -1);
+    //    }
+    //    else if (wParam == Tools.标签_保存) {
+    //        // 处理Ctrl+S的快捷键  
+    //        lgc(L"Ctrl + S", L"按下");
+    //        Tools.we.标签内容保存(Tools.工具箱配置文件, Tools.配置文件);
+    //    }
+
+    //    if (wParam == Tools.标签_切换状态) {
+
+    //        EnableWindow(hWnd_透明标签, FALSE); // 禁用窗口
+    //    }
 
     //    break;
     //}
     case WM_SIZE:
     {
-        SetWindowsSize();
+        Tools.we.标签窗口刷新();
 
         break;
     }
@@ -776,6 +681,5 @@ LRESULT TipsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     default:
         return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }   
-return 0;
+    return 0;
 }
-#endif

@@ -6,7 +6,7 @@
 
 #include "Tools_Tool.h"
 //#include "CommonTools.h"
-//#include "Log.h"
+#include "Log.h"
 
 #include <Windows.h>
 
@@ -17,27 +17,6 @@
 #include <ctime>
 #include <sstream>
 #include <locale>
-
-
-#ifdef UNICODE
-#define Uchar wchar_t
-#define Ustr std::wstring
-#define Ucout std::wcout
-#define Ucerr std::wcerr
-#define Uto_string std::to_wstring
-#define Ufreopen_s _wfreopen_s
-#define Ustrlen wcslen
-
-#else
-#define Uchar char
-#define Ustr std::string
-#define Ucout std::cout
-#define Ucerr std::cerr
-#define Uto_string std::to_string
-#define Ufreopen_s freopen_s
-#define Ustrlen strlen
-
-#endif
 
 namespace Tools_Tool {
 
@@ -60,7 +39,7 @@ namespace Tools_Tool {
 		std::chrono::system_clock::time_point TempTime; //临时的时间
 		std::chrono::steady_clock::time_point TempTime_s; //临时的时间
 
-		bool isHighPrecision = false;
+		bool HighPrecision; //高精度
 		TimeMeasure timeMeasure;
 
 		std::vector<std::chrono::system_clock::time_point> TimerContainer; //计时器 集合(Container)
@@ -72,40 +51,30 @@ namespace Tools_Tool {
 			if (tms != tms::sec) { //高精度
 				InitTime_s = GetTime_s();
 				TimerContainer_s.push_back(InitTime_s);
-				isHighPrecision = true;
+				HighPrecision = true;
 				this->timeMeasure = tms;
 			}
 			else {
 				InitTime = GetTime();
 				TimerContainer.push_back(InitTime);
+				HighPrecision = false;
 				this->timeMeasure = tms;
 			}
 		}
 
-		template<class T = bool>
-		std::wstring StringToWstring(const std::string str)
-		{
-			std::wstring wContext = L"";
-			int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);
-			WCHAR* buffer = new WCHAR[len + 1];
-			MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), buffer, len);
-			buffer[len] = '\0';
-			wContext.append(buffer);
-			delete[] buffer;
-
-			return wContext;
-		}
+		std::wstring StringToWstring(const std::string& str);
+		std::string WstringToString(const std::wstring& wStr);
 
 	public:
 		static std::chrono::system_clock::time_point GetTime();
 #define 获取时间 GetTime
 	
 		void AddTimer();
-		void AddTimer(std::chrono::system_clock::time_point& time);
+		void AddTimer(const std::chrono::system_clock::time_point& time);
 		void AddTimer(std::chrono::system_clock::time_point&& time);
 #define 添加时间戳 AddTimer
 
-		void SetTimer(std::chrono::system_clock::time_point& time, int Location);
+		void SetTimer(const std::chrono::system_clock::time_point& time, int Location);
 		void SetTimer(std::chrono::system_clock::time_point&& time, int Location);
 #define 设置时间戳 SetTimer
 		
@@ -117,11 +86,11 @@ namespace Tools_Tool {
 #define 获取时间_高精度 GetTime_s
 
 		void AddTimer_s();
-		void AddTimer_s(std::chrono::steady_clock::time_point& time);
+		void AddTimer_s(const std::chrono::steady_clock::time_point& time);
 		void AddTimer_s(std::chrono::steady_clock::time_point&& time);
 #define 添加时间戳_高精度 AddTimer_s
 
-		void SetTimer_s(std::chrono::steady_clock::time_point& time, int Location);
+		void SetTimer_s(const std::chrono::steady_clock::time_point& time, int Location);
 		void SetTimer_s(std::chrono::steady_clock::time_point&& time, int Location);
 #define 设置时间戳_高精度 SetTimer_s
 
@@ -144,7 +113,7 @@ namespace Tools_Tool {
 		static long long TransformTime(long long&& time, TimeMeasure tms = tms::sec, TimeMeasure transformLaterTms = tms::ms);
 		static bool TransformTimes(long long& time, TimeMeasure tms = tms::sec, TimeMeasure transformLaterTms = tms::ms);
 #define 时间转换 TransformTime
-#define 时间转换_s TransformTime_s
+#define 时间转换_高精度 TransformTime_s
 		
 		static void sleep_s(long long ms);
 		static void sleep(long long sec);
@@ -153,9 +122,13 @@ namespace Tools_Tool {
 
 	public:
 		std::vector<std::chrono::system_clock::time_point> GetTimerContainer();
+#define 获取计时器容器 GetTimerContainer
 		std::vector<std::chrono::steady_clock::time_point> GetTimerContainer_s();
+#define 获取计时器容器_高精度 GetTimerContainer_s
 		int GetTimerSize();
+#define 获取计时器大小 GetTimerSize
 		int GetTimerSize_s();
+#define 获取计时器大小_高精度 GetTimerSize_s
 
 		template<class Temp = bool>
 		static void FormattingTime(Ustr& text)
@@ -168,13 +141,13 @@ namespace Tools_Tool {
 			std::tm* now_tm = std::localtime(&tm);
 
 			// 使用 std::put_time 格式化时间
-			std::ostringstream oss;
-			oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
-			Ustr temp = (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+			Uostringstream oss;
+			oss << std::put_time(now_tm, T("%Y-%m-%d %H:%M:%S")); // 自定义时间格式
+			Ustr temp = (Ustr)T("[") + oss.str() + T("]") + text;
 			text = temp;
 		}
 		template<class Temp = bool>
-		static Ustr FormattingTime(Ustr& text)
+		static Ustr GetFormattingTime()
 		{
 			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
 			// 获取当前时间点（自epoch以来的时间）
@@ -184,12 +157,12 @@ namespace Tools_Tool {
 			std::tm* now_tm = std::localtime(&tm);
 
 			// 使用 std::put_time 格式化时间
-			std::ostringstream oss;
-			oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
-			return (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+			Uostringstream oss;
+			oss << std::put_time(now_tm, T("%Y-%m-%d %H:%M:%S")); // 自定义时间格式
+			return (Ustr)T("[") + oss.str() + T("]");
 		}
 		template<class Temp = bool>
-		static Ustr FormattingTime(Ustr&& text)
+		static Ustr GetFormattingTime(Ustr timeFormat)
 		{
 			std::chrono::system_clock::time_point now = std::chrono::system_clock::now();;
 			// 获取当前时间点（自epoch以来的时间）
@@ -199,11 +172,12 @@ namespace Tools_Tool {
 			std::tm* now_tm = std::localtime(&tm);
 
 			// 使用 std::put_time 格式化时间
-			std::ostringstream oss;
-			oss << std::put_time(now_tm, "%Y-%m-%d %H:%M:%S"); // 自定义时间格式
-			return (Ustr)TEXT("[") + StringToWstring(oss.str()) + TEXT("]") + text;
+			Uostringstream oss;
+			oss << std::put_time(now_tm, timeFormat.c_str()); // 自定义时间格式
+			return (Ustr)T("[") + oss.str() + T("]");
 		}
-#define 格式化时间 = FormattingTime;
+#define 格式化时间 FormattingTime;
+#define 获取格式化时间 GetFormattingTime;
 
 	};
 }

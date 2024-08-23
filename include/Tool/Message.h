@@ -22,11 +22,11 @@ namespace Tools_Tool {
 			{
 				if (message > 0)
 				{
-					lgc(L"热键注册[" + this->信息 + L"]: 成功👌");
+					lgc(T("热键注册[") + this->信息 + T("]: 成功👌"));
 				}
 				else
 				{
-					lgc(L"热键注册[" + this->信息 + L"]: 错误😒 -> 代码(" + Uto_string(message) + L")", lgm::er);
+					lgc(T("热键注册[") + this->信息 + T("]: 错误😒 -> 代码(") + Uto_string(message) + T(")"), lgm::er);
 				}
 			}
 			RegisterHotKeyMessage(Ustr&& RegisterHotKey热键信息, int message)
@@ -34,11 +34,11 @@ namespace Tools_Tool {
 			{
 				if (message > 0)
 				{
-					lgc(L"热键注册[" + this->信息 + L"]: 成功👌");
+					lgc(T("热键注册[") + this->信息 + T("]: 成功👌"));
 				}
 				else
 				{
-					lgc(L"热键注册[" + this->信息 + L"]: 错误😒 -> 代码(" + Uto_string(message) + L")", lgm::er);
+					lgc(T("热键注册[") + this->信息 + T("]: 错误😒 -> 代码(") + Uto_string(message) + T(")"), lgm::er);
 				}
 			}
 		};
@@ -62,13 +62,13 @@ namespace Tools_Tool {
 
 					//ShellExecute() 成功操作, 则传入为句柄
 					this->ErrorCode = message;
-					lgc(L"Shell消息[" + this->信息 + L"]: 错误😒 -> 代码(" + Uto_string(message) + L")", lgm::er);
+					lgc(T("Shell消息[") + this->信息 + T("]: 错误😒 -> 代码(") + Uto_string(message) + T(")"), lgm::er);
 				}
 				else
 				{
 					this->Status = true;
 					this->ErrorCode = message;
-					lgc(L"Shell消息[" + this->信息 + L"]: 成功 👌");
+					lgc(T("Shell消息[") + this->信息 + T("]: 成功 👌"));
 				}
 			}
 			ShellMessage(Ustr&& Shell信息, int message)
@@ -80,13 +80,13 @@ namespace Tools_Tool {
 
 					//ShellExecute() 成功操作, 则传入为句柄
 					this->ErrorCode = message;
-					lgc(L"Shell消息[" + this->信息 + L"]: 错误😒 -> 代码(" + Uto_string(message) + L")", lgm::er);
+					lgc(T("Shell消息[") + this->信息 + T("]: 错误😒 -> 代码(") + Uto_string(message) + T(")"), lgm::er);
 				}
 				else
 				{
 					this->Status = true;
 					this->ErrorCode = message;
-					lgc(L"Shell消息[" + this->信息 + L"]: 成功 👌");
+					lgc(T("Shell消息[") + this->信息 + T("]: 成功 👌"));
 				}
 			}
 

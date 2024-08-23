@@ -10,17 +10,17 @@ void Tools_Tool::WindowsSystem::WindowHotkey::创建组合按键(HWND hWndEdit, 
 	// 手动构建按键名称 
 	// 修饰符 
 	if (GetKeyState(VK_SHIFT) & 0x8000) {
-		KeyName_lib.push_back(L"Shift");
+		KeyName_lib.push_back(T("Shift"));
 		KeyID_lib.push_back(MOD_SHIFT);
 		修饰符 += 1;
 	}
 	else if (GetKeyState(VK_CONTROL) & 0x8000) {
-		KeyName_lib.push_back(L"Ctrl");
+		KeyName_lib.push_back(T("Ctrl"));
 		KeyID_lib.push_back(MOD_CONTROL);
 		修饰符 += 1;
 	}
 	else if (GetKeyState(VK_MENU) & 0x8000) {
-		KeyName_lib.push_back(L"Alt");
+		KeyName_lib.push_back(T("Alt"));
 		KeyID_lib.push_back(MOD_ALT);
 		修饰符 += 1;
 	}
@@ -41,69 +41,69 @@ void Tools_Tool::WindowsSystem::WindowHotkey::创建组合按键(HWND hWndEdit, 
 
 		//F键
 		if (GetKeyState(VK_F1) & 0x8000) {
-			KeyName_lib.push_back(L"F1");
+			KeyName_lib.push_back(T("F1"));
 			KeyID_lib.push_back(VK_F1);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F2) & 0x8000) {
-			KeyName_lib.push_back(L"F2");
+			KeyName_lib.push_back(T("F2"));
 			KeyID_lib.push_back(VK_F2);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F3) & 0x8000) {
-			KeyName_lib.push_back(L"F3");
+			KeyName_lib.push_back(T("F3"));
 			KeyID_lib.push_back(VK_F3);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F4) & 0x8000) {
-			KeyName_lib.push_back(L"F4");
+			KeyName_lib.push_back(T("F4"));
 			KeyID_lib.push_back(VK_F4);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F5) & 0x8000) {
-			KeyName_lib.push_back(L"F5");
+			KeyName_lib.push_back(T("F5"));
 			KeyID_lib.push_back(VK_F5);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F6) & 0x8000) {
-			KeyName_lib.push_back(L"F6");
+			KeyName_lib.push_back(T("F6"));
 			KeyID_lib.push_back(VK_F6);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F7) & 0x8000) {
-			KeyName_lib.push_back(L"F7");
+			KeyName_lib.push_back(T("F7"));
 			KeyID_lib.push_back(VK_F7);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F8) & 0x8000) {
-			KeyName_lib.push_back(L"F8");
+			KeyName_lib.push_back(T("F8"));
 			KeyID_lib.push_back(VK_F8);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F9) & 0x8000) {
-			KeyName_lib.push_back(L"F9");
+			KeyName_lib.push_back(T("F9"));
 			KeyID_lib.push_back(VK_F9);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F10) & 0x8000) {
-			KeyName_lib.push_back(L"F10");
+			KeyName_lib.push_back(T("F10"));
 			KeyID_lib.push_back(VK_F10);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F11) & 0x8000) {
-			KeyName_lib.push_back(L"F11");
+			KeyName_lib.push_back(T("F11"));
 			KeyID_lib.push_back(VK_F11);
 			基础按键 = true;
 		}
 		else if (GetKeyState(VK_F12) & 0x8000) {
-			KeyName_lib.push_back(L"F12");
+			KeyName_lib.push_back(T("F12"));
 			KeyID_lib.push_back(VK_F12);
 			基础按键 = true;
 		}
 
 		//符号
 		if (GetKeyState(VK_OEM_3) & 0x8000) {
-			KeyName_lib.push_back(L"`");
+			KeyName_lib.push_back(T("`"));
 			KeyID_lib.push_back(VK_OEM_3);
 			基础按键 = true;
 		}
@@ -111,14 +111,14 @@ void Tools_Tool::WindowsSystem::WindowHotkey::创建组合按键(HWND hWndEdit, 
 
 	// 获取编辑控件的文本
 	Uchar buffer[256];
-	lgc(L"Tools_Tool::WindowsSystem::WindowHotkey::创建组合按键名()::GetWindowText()之前用于对比返回值的错误代码: " + Uto_string(GetLastError()), lgm::er);
+	lgc(T("Tools_Tool::WindowsSystem::WindowHotkey::创建组合按键名()::GetWindowText()之前用于对比返回值的错误代码: ") + Uto_string(GetLastError()), lgm::er);
 	int charLen = GetWindowText(hWndEdit, buffer, sizeof(buffer) / sizeof(buffer[0]));
 	if (charLen == 0) {
-		lgc(L"Tools_Tool::WindowsSystem::WindowHotkey::创建组合按键名()::GetWindowText() 错误代码: " + Uto_string(GetLastError()), lgm::er);
+		lgc(T("Tools_Tool::WindowsSystem::WindowHotkey::创建组合按键名()::GetWindowText() 错误代码: ") + Uto_string(GetLastError()), lgm::er);
 	}
 	// 根据修饰符个数判断 存储的位置
 	if (修饰符 > 1) {
-		组合按键名 = (Ustr)buffer + L" + " + KeyName_lib[修饰符 - 1];
+		组合按键名 = (Ustr)buffer + T(" + ") + KeyName_lib[修饰符 - 1];
 	}
 	else {
 		组合按键名 = KeyName_lib[0];
@@ -132,8 +132,8 @@ void Tools_Tool::WindowsSystem::WindowHotkey::清除组合按键(HWND hWndEdit)
 	修饰符 = 0;
 	KeyName_lib.clear();
 	KeyID_lib.clear();
-	组合按键名 = L"";
-	SetWindowText(hWndEdit, L"");
+	组合按键名 = T("");
+	SetWindowText(hWndEdit, T(""));
 }
 
 void Tools_Tool::WindowsSystem::WindowHotkey::注册按键(HWND hWnd)

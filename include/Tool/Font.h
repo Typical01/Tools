@@ -27,7 +27,7 @@ namespace Tools_Tool {
 					FALSE, //删除线
 					DEFAULT_CHARSET, OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS, DEFAULT_QUALITY,
 					FF_DONTCARE,
-					TEXT("微软雅黑")
+					T("微软雅黑")
 				);
 				*/
 			}

@@ -20,7 +20,7 @@ namespace Tools_Tool {
 
 			std::vector<Ustr> KeyName_lib;
 			std::vector<int> KeyID_lib;
-			Ustr 组合按键名 = L"";
+			Ustr 组合按键名 = T("");
 			int 修饰符 = 0;
 			bool 基础按键 = false;
 

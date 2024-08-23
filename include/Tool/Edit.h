@@ -6,33 +6,73 @@
 #include "Tools_Tool.h"
 #include "Log.h"
 #include "WindowHosting.h"
+#include "CharHandleOfConfigFile.h"
+#include "ToolsConfigFile.h"
 
 #include <Windows.h>
 #include <commctrl.h>
 #include <map>
 #include <string>
 
+
+using namespace Tools_Tool::StringHandling;
+
 namespace Tools_Tool {
 	namespace WindowsSystem {
 
 		class TOOLS_TOOL_API WindowEdit {
 		private:
-			WindowHosting WH;
+			HWND hWnd_标签主窗口;
+			HWND hWnd_标签选项卡;
+			HWND hWnd_标签命名;
+			HWND hWnd_标签命名_编辑框;
+			HWND hWnd_标签命名_确认按键;
+			int 标签选项卡计数;
 
-			HWND hWnd_标签;
-			HWND 最新的编辑窗口;
-			HWND hWnd_标签列控件;
-			std::map<int, HWND> hWnd_标签编辑窗口;
+			HWND hWnd_编辑窗口;
+			std::map<Ustr, Ustr> hWnd_标签内容;
+			TCITEMW 标签选项卡;
+
+			int 主窗口宽;
+			int 主窗口高;
+		public:
+			int 标签菜单_Add;
+			int 标签菜单_Set;
+			int 标签菜单_Del; 
+			int 标签菜单_Help;
+			int 标签菜单_Save;
+
+			int 标签命名_编辑框;
+			int 标签命名_确认按键;
 
 		public:
 			WindowEdit() { }
 
 		public:
 
-			void SetWindowsSize();
-			void CreateEditWindows(int tempInt);
+			void Init(CharHandleOfConfigFile& 配置文件);
+
+			void 创建标签窗口(Ustr 标签窗口类名, WinHost& wh);
+			void 显示标签窗口(int 显示窗口 = 5);
+			void 显示命名窗口(int 显示窗口 = 5);
+			
+			void 添加标签();
+			void 添加标签(Ustr 标签名, Ustr& 标签内容);
+			void 添加标签(Ustr 标签名, Ustr&& 标签内容);
+			void 修改标签();
+			void 删除标签();
+			Ustr Get标签名(int 标签计数);
+			int Get当前标签选项();
+			void 显示标签内容(Ustr 标签名);
+
+			static bool 获取句柄文本(HWND hWnd, Ustr& 文本);
+			int Get标签计数();
+
+		public:
+			void 标签窗口刷新();
+			void 标签内容保存(ToolsConfigFile& 工具箱配置文件, CharHandleOfConfigFile& 配置文件);
 		};
-		using 窗口控件 = WindowEdit;
+		using WinEdit = WindowEdit;
 	}
 }
 

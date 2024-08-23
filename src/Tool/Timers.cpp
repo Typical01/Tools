@@ -20,7 +20,7 @@ void Tools_Tool::Timers::AddTimer()
 {
 	this->TimerContainer.push_back(GetTime());
 }
-void Tools_Tool::Timers::AddTimer(std::chrono::system_clock::time_point& time)
+void Tools_Tool::Timers::AddTimer(const std::chrono::system_clock::time_point& time)
 {
 	this->TimerContainer.push_back(time);
 }
@@ -32,7 +32,7 @@ void Tools_Tool::Timers::AddTimer_s()
 {
 	this->TimerContainer_s.push_back(GetTime_s());
 }
-void Tools_Tool::Timers::AddTimer_s(std::chrono::steady_clock::time_point& time)
+void Tools_Tool::Timers::AddTimer_s(const std::chrono::steady_clock::time_point& time)
 {
 	this->TimerContainer_s.push_back(time);
 }
@@ -41,7 +41,7 @@ void Tools_Tool::Timers::AddTimer_s(std::chrono::steady_clock::time_point&& time
 	this->TimerContainer_s.push_back(time);
 }
 
-void Tools_Tool::Timers::SetTimer(std::chrono::system_clock::time_point& time, int Location)
+void Tools_Tool::Timers::SetTimer(const std::chrono::system_clock::time_point& time, int Location)
 {
 	this->TimerContainer[Location] = time;
 }
@@ -49,7 +49,7 @@ void Tools_Tool::Timers::SetTimer(std::chrono::system_clock::time_point&& time, 
 {
 	this->TimerContainer[Location] = time;
 }
-void Tools_Tool::Timers::SetTimer_s(std::chrono::steady_clock::time_point& time, int Location)
+void Tools_Tool::Timers::SetTimer_s(const std::chrono::steady_clock::time_point& time, int Location)
 {
 	this->TimerContainer_s[Location] = time;
 }
@@ -67,11 +67,91 @@ std::chrono::steady_clock::time_point Tools_Tool::Timers::GetTimer_s(int Locatio
 	return this->TimerContainer_s[Location];
 }
 
+std::wstring Tools_Tool::Timers::StringToWstring(const std::string& str)
+{
+	std::wstring wContext;
+
+	if (str.empty()) {
+		return wContext;
+	}
+
+#ifdef _WINDOWS
+	// Windows 版本
+	int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), nullptr, 0);
+	if (len <= 0) {
+		throw std::runtime_error("Failed to convert string to wide string.");
+	}
+	std::unique_ptr<wchar_t[]> buffer(new wchar_t[len + 1]);
+	if (MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), buffer.get(), len) <= 0) {
+		throw std::runtime_error("Failed to convert string to wide string.");
+	}
+	buffer[len] = T('\0');
+	wContext.assign(buffer.get());
+#else
+	// POSIX 版本
+	std::unique_ptr<char[]> buffer(new char[str.size() * 4]);  // 大小预留空间
+	size_t out_len = str.size() * 4;
+	iconv_t cd = iconv_open("UTF-16LE", "ISO-8859-1");
+	if (cd == (iconv_t)-1) {
+		throw std::runtime_error("Failed to open iconv descriptor.");
+	}
+	if (iconv(cd, const_cast<const char**>(&str.c_str()), &str.size(), reinterpret_cast<char**>(buffer.get()), &out_len) == (size_t)-1) {
+		iconv_close(cd);
+		throw std::runtime_error("Failed to convert string using iconv.");
+	}
+	iconv_close(cd);
+	wContext.assign(reinterpret_cast<wchar_t*>(buffer.get()));
+#endif
+
+	return wContext;
+}
+
+std::string Tools_Tool::Timers::WstringToString(const std::wstring& wStr)
+{
+	std::string context;
+
+	if (wStr.empty()) {
+		return context;
+	}
+
+#ifdef _WINDOWS
+	// Windows 版本
+	int len = WideCharToMultiByte(CP_UTF8, 0, wStr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	if (len <= 0) {
+		throw std::runtime_error("Failed to convert wide string to string.");
+	}
+	std::unique_ptr<char[]> buffer(new char[len + 1]);
+	if (WideCharToMultiByte(CP_UTF8, 0, wStr.c_str(), -1, buffer.get(), len, nullptr, nullptr) <= 0) {
+		throw std::runtime_error("Failed to convert wide string to string.");
+	}
+	buffer[len] = '\0';
+	context.assign(buffer.get());
+#else
+	// POSIX 版本
+	std::unique_ptr<char[]> buffer(new char[wStr.size() * 4]);  // 大小预留空间
+	size_t out_len = wStr.size() * 4;
+	iconv_t cd = iconv_open("ISO-8859-1", "UTF-16LE");
+	if (cd == (iconv_t)-1) {
+		throw std::runtime_error("Failed to open iconv descriptor.");
+	}
+	size_t in_len = wStr.size() * sizeof(wchar_t);
+	const char* in = reinterpret_cast<const char*>(wStr.c_str());
+	if (iconv(cd, const_cast<const char**>(&in), &in_len, reinterpret_cast<char**>(buffer.get()), &out_len) == (size_t)-1) {
+		iconv_close(cd);
+		throw std::runtime_error("Failed to convert wide string using iconv.");
+	}
+	iconv_close(cd);
+	context.assign(buffer.get(), buffer.get() + (wStr.size() * 4 - out_len));
+#endif
+
+	return context;
+}
+
 long long Tools_Tool::Timers::ComputationFirstToEndInterval()
 {
 	// first - end
-	if (!this->isHighPrecision) {
-		return std::chrono::duration_cast<std::chrono::milliseconds>(
+	if (!this->HighPrecision) {
+		return std::chrono::duration_cast<std::chrono::seconds>(
 			this->TimerContainer[this->TimerContainer.size() - 1] - this->TimerContainer[0]).count();
 	}
 	else {
@@ -100,8 +180,8 @@ long long Tools_Tool::Timers::ComputationFirstToEndInterval()
 long long Tools_Tool::Timers::ComputationFrontToBackInterval()
 {
 	// front - end
-	if (!this->isHighPrecision) {
-		return std::chrono::duration_cast<std::chrono::milliseconds>(
+	if (!this->HighPrecision) {
+		return std::chrono::duration_cast<std::chrono::seconds>(
 			this->TimerContainer[this->TimerContainer.size() - 1] - this->TimerContainer[this->TimerContainer.size() - 2]).count();
 	}
 	else {
@@ -141,8 +221,8 @@ long long Tools_Tool::Timers::ComputationInterval(int LocationBegin, int Locatio
 	}
 
 	// front - end
-	if (!this->isHighPrecision) {
-		return std::chrono::duration_cast<std::chrono::milliseconds>(
+	if (!this->HighPrecision) {
+		return std::chrono::duration_cast<std::chrono::seconds>(
 			this->TimerContainer[LocationEnd] - this->TimerContainer[LocationBegin]).count();
 	}
 	else {
@@ -826,7 +906,10 @@ void Tools_Tool::Timers::sleep_s(long long ms)
 
 void Tools_Tool::Timers::sleep(long long sec)
 {
-	std::this_thread::sleep_for(std::chrono::seconds(sec));
+	for (long long temp = 0; temp < sec; temp++) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		lgc(T("暂停: ") + Uto_string(temp) + T("秒"), lgm::wr);
+	}
 }
 
 std::vector<std::chrono::system_clock::time_point> Tools_Tool::Timers::GetTimerContainer()

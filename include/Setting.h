@@ -11,6 +11,8 @@
 #include "Message.h"
 #include "Shell.h"
 #include "Hotkey.h"
+#include "Edit.h"
+#include "Shell.h"
 
 #include <Windows.h>
 #include <string>
@@ -19,6 +21,7 @@ using namespace Tools_Tool;
 using namespace Tools_Tool::WindowsSystem;
 using Tools_Tool::WindowsSystem::WindowHosting;
 using Tools_Tool::WindowsSystem::WindowHotkey;
+using Tools_Tool::WindowsSystem::WindowEdit;
 
 class Settings {
 public:
@@ -36,20 +39,25 @@ public:
 	const wchar_t* 程序_名 = L"Tools";
 	//SetWindowLongPtr(hwndEdit, GWLP_WNDPROC, (LONG_PTR)SubclassedEditProc);
 	const wchar_t* 程序_窗口类名 = L"典型一号的工具箱";
-	/*const wchar_t* 程序_设置窗口类名 = L"典型一号的工具箱设置";
-	const wchar_t* 程序_标签窗口类名 = L"典型一号的工具箱标签";*/
-
+	const wchar_t* 程序_标签窗口类名 = L"典型一号的工具箱_标签";
+	
 	const wchar_t* 程序_托盘名 = L"工具箱托盘菜单";
 	const wchar_t* 程序_标题栏名 = L"典型一号的工具箱 v1.0";
 	const wchar_t* 程序_标题栏名_设置窗口 = L"工具箱设置";
 	const wchar_t* 程序_标题栏名_标签窗口 = L"工具箱标签";
 
 	//窗口操作
-	WindowHosting WinHost;
-	WL 设置窗口位置;
+	WinHost wh;
+	//WindowLocationInfo 设置窗口位置;
+	WindowEdit we;
+	WindowShell ws;
 
 	//设置
+	CharHandleOfConfigFile 配置文件;
 	Tools_Tool::ToolsConfigFile 工具箱配置文件;
+	std::map<Ustr, Ustr> 基本设置内容;
+	std::map<Ustr, std::map<Ustr, Ustr>> 配置文件全内容;
+
 	int 进度条百分比值 = 0;
 	bool 修改屏幕分辨率 = false;
 	std::wstring 笔记本键盘关闭 = L"sc config i8042prt start= disabled"; //关闭
@@ -74,12 +82,6 @@ public:
 	int ID_修改屏幕分辨率;
 	int ID_Ping;
 
-	int 标签菜单_Add;
-	int 标签菜单_Set;
-	int 标签菜单_Del;
-	int 标签菜单_Setting;
-	int 标签菜单_Help;
-
 	int 确认按钮;
 	int 取消按钮;
 
@@ -88,6 +90,11 @@ public:
 	int 菜单_打开Repos;
 	int 菜单_打开Lib;
 	int 标签_全选;
+	int 标签_保存;
+	int 标签_打开;
+	int 标签_切换状态;
+	
+	bool 标签_是否修改;
 
 public:
 	Settings() {}
@@ -105,13 +112,14 @@ void UpdateConfig();
 int Windows程序启动项();
 void Windows窗口类注册();
 void Windows窗口创建();
-//窗口创建后的初始化: WM_CREATE
-void 初始化();
 
+void 初始化();
+void 打开配置文件();
+
+void 菜单生成(HMENU 菜单);
 void 菜单选择(int 菜单选项ID);
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK SettingWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-//LRESULT CALLBACK TipsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK TipsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 #endif
