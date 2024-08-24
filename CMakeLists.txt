@@ -50,12 +50,11 @@ endforeach()
 # 设置 CMake 配置类型
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
-# 根据 LINK_FLAGS 的值选择合适的库版本
+# 检查编译器类型
 if(MSVC)
-  get_target_property(Tools_LINK_FLAGS Tools LINK_FLAGS)
-  if(Tools_LINK_FLAGS STREQUAL "/SUBSYSTEM:WINDOWS")
-    target_link_libraries(Tools libTools_Tool_Win)
-  else()
-    target_link_libraries(Tools libTools_Tool)
-  endif()
+  # MSVC-specific settings
+  set_target_properties(Tools PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  # GCC and Clang-specific settings
+  set_target_properties(Tools PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
 endif()
