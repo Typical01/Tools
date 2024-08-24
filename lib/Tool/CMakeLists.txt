@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(libTools_Tool)
 
-add_compile_definitions(_UNICODE)
+#add_compile_definitions(_UNICODE)
 add_compile_definitions(TOOLS_TOOL_EXPORTS)
 
 file(GLOB SRC_Tool_LIST "${CMAKE_CURRENT_SOURCE_DIR}/../../src/Tool/*.cpp")

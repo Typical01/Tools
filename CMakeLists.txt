@@ -4,7 +4,7 @@ project(Tools)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/Tool)
 
-add_compile_definitions(_UNICODE)
+# add_compile_definitions(_UNICODE)
 
 file(GLOB CPP_LIST "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 file(GLOB RC_LIST "${CMAKE_CURRENT_SOURCE_DIR}/src/*.rc")
