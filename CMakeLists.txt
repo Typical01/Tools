@@ -1,60 +1,53 @@
-# 指定 CMake 的最低版本要求
 cmake_minimum_required(VERSION 3.10)
-
-# 定义项目名称
 project(Tools)
 
-# 添加 lib/Tool 子目录中的 CMakeLists.txt 文件
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/Tool)
+# 子 CMake.txt
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/Tool)
 
-# 使用 file(GLOB) 命令获取所有源文件和资源文件
-file(GLOB CPP_LIST "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-file(GLOB RC_LIST "${CMAKE_CURRENT_SOURCE_DIR}/src/*.rc")
-list(APPEND CPP_LIST ${RC_LIST})
+# 查找所有源文件和头文件
+file(GLOB_RECURSE SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB_RECURSE libHEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/libTypical_Tool/*.h")
+file(GLOB_RECURSE RC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.rc")
 
-# 包含头文件目录
+list(APPEND FILE_LIST ${SOURCE_FILES} ${HEADER_FILES} ${RC_FILES} ${libHEADER_FILES})
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/Tool)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/libTypical_Tool)
 
-# 添加可执行文件目标 Tools，并指定其源文件
-add_executable(Tools ${CPP_LIST})
+add_executable(Tools ${FILE_LIST})
 
-# 设置链接器选项，将子系统设置为 Windows
-set_target_properties(Tools PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
+# 链接的库
+# 使用 generator expressions 设置链接库
+target_link_libraries(Tools
+    $<$<CONFIG:Debug>:${CMAKE_CURRENT_SOURCE_DIR}/lib/libTypical_Tool/Debug_Win/libTypical_Tool.lib>
+    $<$<CONFIG:Release>:${CMAKE_CURRENT_SOURCE_DIR}/lib/libTypical_Tool/Release_Win/libTypical_Tool.lib>
+)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
-# 设置可执行文件的输出目录
 set_target_properties(Tools PROPERTIES
-  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}"
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}"
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE}"
 )
 
-# 遍历 CMAKE_CONFIGURATION_TYPES 列表中的每个配置类型
-# 这里只需要 Debug 和 Release 配置
-foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
-  if(config STREQUAL "Debug")
-    set_target_properties(Tools PROPERTIES
-      OUTPUT_NAME "Tools_Debug"
-      ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${config}"
-      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${config}"
-      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${config}"
-    )
-  elseif(config STREQUAL "Release")
-    set_target_properties(Tools PROPERTIES
-      OUTPUT_NAME "Tools"
-      ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${config}"
-      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${config}"
-      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin/${config}"
-    )
-  endif()
-endforeach()
-
-# 设置 CMake 配置类型
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
-# 检查编译器类型
+# 设置不同配置的编译定义
+target_compile_definitions(Tools
+  PRIVATE
+  $<$<CONFIG:Debug>:_DEBUG;_WINDOWS>
+  $<$<CONFIG:Release>:NDEBUG;_WINDOWS>
+)
+
 if(MSVC)
-  # MSVC-specific settings
   set_target_properties(Tools PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  # GCC and Clang-specific settings
   set_target_properties(Tools PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
 endif()
+
+# 分组源文件和头文件
+source_group("Header Files" FILES ${HEADER_FILES})
+source_group("Source Files" FILES ${SOURCE_FILES})
+source_group("Rc Files" FILES ${RC_FILES})
+source_group("lib Header Files" FILES ${libHEADER_FILES})

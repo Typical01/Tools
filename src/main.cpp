@@ -10,9 +10,6 @@ int APIENTRY wWinMain(
     _In_ int nShowCmd
 )
 {
-    //Log::SetConsoleShow(false);
-    Log::SetAllConsoleTimeShow(false);
-
     if (!Windows程序启动项()) {
         return 0;
     }
