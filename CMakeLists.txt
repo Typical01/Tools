@@ -46,6 +46,24 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "C
   set_target_properties(Tools PROPERTIES LINK_FLAGS "-Wl,--subsystem,windows")
 endif()
 
+if (MSVC)
+  #对于调试和发布配置，明确地删除_WINDOWS
+  # target_compile_options(Tools
+  #   PRIVATE
+  #   $<$<CONFIG:Debug>:/U_WINDOWS>
+  #   $<$<CONFIG:Release>:/U_WINDOWS>
+  # )
+
+  # 对于所有配置设置 UTF-8 编码
+  target_compile_options(Tools
+  PRIVATE
+  $<$<CONFIG:Debug>:/utf-8>
+  $<$<CONFIG:Release>:/utf-8>
+  $<$<CONFIG:Debug_Win>:/utf-8>
+  $<$<CONFIG:Release_Win>:/utf-8>
+)
+endif()
+
 # 分组源文件和头文件
 source_group("Header Files" FILES ${HEADER_FILES})
 source_group("Source Files" FILES ${SOURCE_FILES})
