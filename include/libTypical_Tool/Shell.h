@@ -52,14 +52,6 @@ namespace Typical_Tool {
 				
 			}
 
-		private:
-			static std::wstring StringToWstring(const std::string& str);
-			static std::wstring StringToWstring(std::string&& str);
-#define stow StringToWstring
-			static std::string WstringToString(const std::wstring& wstr);
-			static std::string WstringToString(std::wstring&& wstr);
-#define wtos WstringToString
-
 		public:
 			void Shell处理(HMENU 菜单, std::vector<ShellConfig>& Shell配置);
 			void 执行程序启动项Shell();

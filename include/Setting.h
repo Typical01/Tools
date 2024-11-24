@@ -39,11 +39,11 @@ public:
 	NOTIFYICONDATA nid = { 0 };
 	UINT WM_TASKBARCREATED;
 
-	const Tchar* 程序_名 = _T("Tools");
-	const Tchar* 程序_窗口类名 = _T("Typical_Tools");
+	Tstr 程序_名 = "Tools";
+	const wchar_t* 程序_窗口类名 = L"Typical_Tools";
 	
-	const Tchar* 程序_托盘名 = _T("典型一号的工具箱");
-	const Tchar* 程序_标题栏名 = _T("典型一号的工具箱 v1.0");
+	Tstr 程序_托盘名 = "典型一号的工具箱";
+	Tstr 程序_标题栏名 = "典型一号的工具箱 v1.0_Plus";
 
 	//窗口操作
 	WinHost wh;

@@ -6,7 +6,7 @@
 void 配置初始化()
 {
     lgc(_T("配置初始化()"));
-    Tools.配置文件.SetShowManageLog(false);
+    Tools.配置文件.SetShowManageLog(true);
     //先创建文件夹(否则后面的文件不能创建): \\Tools\\config
     if (WindowsSystem::CreateFolder(Tools.工具箱配置文件.Get程序父文件夹路径() + _T("\\config"))) {
         //文件不存在时，创建
@@ -22,12 +22,6 @@ void 配置初始化()
             区域内容.push_back(_T("注册表开机自启动=否"));
             区域内容.push_back(_T("文件夹快捷键=否"));
 
-            std::vector<Tstr> nv_smi;
-            nv_smi.push_back(_T("菜单按键=否"));
-            nv_smi.push_back(_T("模式=管理员运行"));
-            nv_smi.push_back(_T("文件=cmd"));
-            nv_smi.push_back(_T("参数=/k nvidia-smi -lgc 900"));
-            nv_smi.push_back(_T("显示窗口=否"));
             std::vector<Tstr> ping_baidu;
             ping_baidu.push_back(_T("菜单按键=是"));
             ping_baidu.push_back(_T("模式=打开文件"));
@@ -47,8 +41,9 @@ void 配置初始化()
             笔记本键盘关.push_back(_T("参数=sc config i8042prt start= disabled"));
             笔记本键盘关.push_back(_T("显示窗口=是"));
 
+            Tools.配置文件.AddConfig_FormatSampleText();
             Tools.配置文件.AddConfig(_T("基本设置"), 区域内容);
-            Tools.配置文件.AddConfig(_T("nvidia-smi"), nv_smi);
+            //Tools.配置文件.AddConfig(_T("nvidia-smi"), nv_smi);
             Tools.配置文件.AddConfig(_T("ping-baidu"), ping_baidu);
             Tools.配置文件.AddConfig(_T("笔记本键盘开"), 笔记本键盘开);
             Tools.配置文件.AddConfig(_T("笔记本键盘关"), 笔记本键盘关);
@@ -164,7 +159,7 @@ int Windows程序启动项()
     lgc(_T("Windows程序启动项()"));
 
     WinSys::WindowDPI();
-    if (WinSys::单实例运行(Tools.程序_窗口类名, Tools.程序_标题栏名) == 0) {
+    if (WinSys::单实例运行(wtos(Tools.程序_窗口类名), Tools.程序_标题栏名) == 0) {
         return 0;
     }
 
@@ -208,7 +203,7 @@ void Windows窗口类注册()
 {
     lgc(_T("Windows窗口类注册()"));
 
-    WNDCLASS wndclass = { 0 };
+    WNDCLASSW wndclass = { 0 };
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndProc;
     wndclass.cbClsExtra = 0;
@@ -222,7 +217,6 @@ void Windows窗口类注册()
     Tools.wh.注册窗口类(wndclass);
 
     WinHost::注册进度条窗口类();
-
 }
 
 void Windows窗口创建()
@@ -234,11 +228,11 @@ void Windows窗口创建()
     //按键
     Tools.ID_修改屏幕分辨率 = WindowHosting::GetHMENU();
 
-    Tools.hWnd_托盘 = CreateWindowEx(
+    Tools.hWnd_托盘 = CreateWindowExW(
     // 此处使用WS_EX_TOOLWINDOW 属性来隐藏显示在任务栏上的窗口程序按钮  
         WS_EX_TOOLWINDOW,
         //0,
-        Tools.程序_窗口类名, Tools.程序_标题栏名,
+        Tools.程序_窗口类名, stow(Tools.程序_标题栏名).c_str(),
         WS_POPUP,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
@@ -248,7 +242,7 @@ void Windows窗口创建()
     Tools.wh.添加窗口托管("hWnd_托盘", Tools.hWnd_托盘);
 
     // 不要修改TaskbarCreated，这是系统任务栏自定义的消息  
-    Tools.WM_TASKBARCREATED = RegisterWindowMessage(_T("TaskbarCreated"));
+    Tools.WM_TASKBARCREATED = RegisterWindowMessageW(L"TaskbarCreated");
 }
 
 void 菜单生成(HMENU 菜单)
@@ -274,9 +268,9 @@ void 菜单生成(HMENU 菜单)
     Tools.菜单_打开Repos = WindowHotkey::GetHotkey();
     Tools.菜单_打开Lib = WindowHotkey::GetHotkey();
 
-    热键注册消息 热键注册_修改分辨率(_T("Ctrl + Alt + F9"), RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_修改分辨率, MOD_CONTROL | MOD_ALT, VK_F9));
-    热键注册消息 热键注册_打开Repos(_T("Ctrl + Alt + F10"), RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Repos, MOD_CONTROL | MOD_ALT, VK_F10));
-    热键注册消息 热键注册_打开Lib(_T("Ctrl + Alt + F11"), RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Lib, MOD_CONTROL | MOD_ALT, VK_F11));
+    热键注册消息 热键注册_修改分辨率("Ctrl + Alt + F9", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_修改分辨率, MOD_CONTROL | MOD_ALT, VK_F9));
+    热键注册消息 热键注册_打开Repos("Ctrl + Alt + F10", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Repos, MOD_CONTROL | MOD_ALT, VK_F10));
+    热键注册消息 热键注册_打开Lib("Ctrl + Alt + F11", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Lib, MOD_CONTROL | MOD_ALT, VK_F11));
 }
 
 void 菜单选择(int 菜单选项ID)
@@ -362,7 +356,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (Tools.nid.hIcon == NULL) {
             lg(_T("菜单图标资源无效!"), lm::er);
         }
-        lstrcpy(Tools.nid.szTip, Tools.程序_托盘名);
+        lstrcpy(Tools.nid.szTip, Tools.程序_托盘名.c_str());
 
         Tools.hMenu = CreatePopupMenu(); //生成菜单
 
@@ -370,7 +364,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         //lgc(_T("Shell_NotifyIcon之前 ErrorCode:") + Tto_string(GetLastError()), lm::er);
         if (!Shell_NotifyIcon(NIM_ADD, &Tools.nid)) {
-            lgc(_T("Shell_NotifyIcon ErrorCode:") + Tto_string(GetLastError()), lm::er);
+            lgc("Shell_NotifyIcon ErrorCode:" + Tto_string(GetLastError()), lm::er);
         }
 
         /*Tchar tempMenuStr[MAX_PATH] = _T("");

@@ -10,6 +10,10 @@ int APIENTRY wWinMain(
     _In_ int nShowCmd
 )
 {
+#ifndef _DEBUG
+        lgcr.SetShowConsole(false);
+#endif
+
     if (!Windows程序启动项()) {
         return 0;
     }

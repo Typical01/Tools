@@ -34,8 +34,6 @@ namespace Typical_Tool {
 			std::map<Tstr, std::map<Tstr, Tstr>> ConfigMap; //总配置
 			std::map<int, Tstr> OtherCharMap; //其他非配置项
 
-			int ConfigSum; //配置总数
-			
 			bool ShowManageLog = false; //显示配置处理过程日志
 			bool FormatText = false;
 
@@ -51,7 +49,7 @@ namespace Typical_Tool {
 			* ShowManageLog: 显示配置处理过程日志
 			*/
 			ConfigFileTextManage(bool _ShowManageLog = true)
-				: ConfigSum(0), ShowManageLog(_ShowManageLog)
+				: ShowManageLog(_ShowManageLog)
 			{
 			}
 
@@ -141,6 +139,7 @@ namespace Typical_Tool {
 		public:
 			//配置格式示例
 			void ConfigFormatSample();
+			void AddConfig_FormatSampleText();
 		};
 		using CfgFile = ConfigFileTextManage;
 

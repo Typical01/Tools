@@ -77,7 +77,6 @@ namespace Typical_Tool
 #endif
 #define PATH_BACKSLASH "/"
 
-#define Log_nl "temp"
 #define Log_lf '\n'
 #define Log_ts "[INFO]"
 #define Log_wr "[WARNING]"
@@ -619,13 +618,13 @@ namespace Typical_Tool
 				if (CMD)
 				{
 					Tstr temp;
-					SetConsoleTextColor(ANSI_RED); //在时间输出之前
+					SetConsoleTextColor_Error(ANSI_RED); //在时间输出之前
 					/*if (ShowTime) {
 						Tcout << GetFormattingTime();
 					}*/
 					temp = (Tstr)Log_er + " " + text + "\n";
-					ConsoleOutput(temp);
-					ReSetConsoleTextColor();
+					ConsoleOutput_Error(temp);
+					ReSetConsoleTextColor_Error();
 
 					//WriteConfigFile log日志
 					if (LogFileWrite) {
@@ -687,9 +686,9 @@ namespace Typical_Tool
 				}
 #ifdef _WINDOWS
 #ifndef UNICODE
-				MessageBoxW(NULL, stow(text).c_str(), stow(Log_nl).c_str(), MB_OK);
+				MessageBoxW(NULL, stow(text).c_str(), stow("Text").c_str(), MB_OK);
 #else
-				MessageBoxW(NULL, text.c_str(), Log_nl, MB_OK);
+				MessageBoxW(NULL, text.c_str(), _T("Text"), MB_OK);
 #endif
 #endif
 				
