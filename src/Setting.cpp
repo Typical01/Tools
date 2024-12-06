@@ -180,7 +180,7 @@ int Windows程序启动项()
     }
     初始化();
 
-    Tools.Icon = (LPTSTR)IDI_ICON256X;
+    Tools.Icon = (LPWSTR)IDI_ICON256X;
     Tools.hIns = GetModuleHandle(NULL);
 
     HFONT Font = CreateFont(
@@ -209,7 +209,7 @@ void Windows窗口类注册()
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = Tools.hIns;
-    wndclass.hIcon = LoadIcon(Tools.hIns, Tools.Icon);
+    wndclass.hIcon = LoadIconW(Tools.hIns, Tools.Icon);
     wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
     wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wndclass.lpszMenuName = NULL;
@@ -315,10 +315,10 @@ void 菜单选择(int 菜单选项ID)
 \t例如:\n\
 \t16:9 1920x1080\n\
 \t4:3  1280x960\n\
-\n快捷键:\tCtrl + Alt + F9: 修改分辨率\n\
-\t需要在配置文件中修改: 文件夹快捷键=是\n\
+\n快捷键:\t  Ctrl + Alt + F9: 修改分辨率\n\
 \t  Ctrl + Alt + F10: 打开 Repos 文件夹\n\
 \t  Ctrl + Alt + F11: 打开 Lib 文件夹\n\
+(需要在配置文件中修改: 文件夹快捷键=是)\n\
 "), _L("快捷键帮助"), NULL);
     }
 
@@ -346,24 +346,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         lgc(_T("WndProc::WM_CREATE"));
         
         // NOTIFYICONDATA: 用于与任务栏通知区域（也称为系统托盘）中的图标进行交互
-        Tools.nid.cbSize = sizeof(NOTIFYICONDATA);
+        Tools.nid.cbSize = sizeof(NOTIFYICONDATAW);
         // hWnd: 传入的 hWnd, 否则 Shell_NotifyIcon添加托盘图标时会报错: 2147500037
         Tools.nid.hWnd = hWnd;
         Tools.nid.uID = 1;
         Tools.nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP | NIF_SHOWTIP;
         Tools.nid.uCallbackMessage = WM_TRAY;
-        Tools.nid.hIcon = LoadIcon(Tools.hIns, MAKEINTRESOURCE(Tools.Icon));
+        Tools.nid.hIcon = LoadIconW(Tools.hIns, MAKEINTRESOURCEW(Tools.Icon));
         if (Tools.nid.hIcon == NULL) {
             lg(_T("菜单图标资源无效!"), lm::er);
         }
-        lstrcpy(Tools.nid.szTip, Tools.程序_托盘名.c_str());
+        lstrcpyW(Tools.nid.szTip, stow(Tools.程序_托盘名).c_str());
 
         Tools.hMenu = CreatePopupMenu(); //生成菜单
 
         菜单生成(Tools.hMenu);
 
         //lgc(_T("Shell_NotifyIcon之前 ErrorCode:") + Tto_string(GetLastError()), lm::er);
-        if (!Shell_NotifyIcon(NIM_ADD, &Tools.nid)) {
+        if (!Shell_NotifyIconW(NIM_ADD, &Tools.nid)) {
             lgc("Shell_NotifyIcon ErrorCode:" + Tto_string(GetLastError()), lm::er);
         }
 
@@ -404,6 +404,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     case WM_HOTKEY:
     {        
+        lgc("快捷键: WM_HOTKEY");
+
         //按键消息为: Ctrl+Alt+F9 时: 修改屏幕分辨率
         if (Tools.菜单_修改分辨率 == wParam)
         {
@@ -452,7 +454,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     case WM_DESTROY: //窗口销毁时候的消息.  
     {
-        Shell_NotifyIcon(NIM_DELETE, &Tools.nid);
+        Shell_NotifyIconW(NIM_DELETE, &Tools.nid);
         PostQuitMessage(0);
         break;
     }

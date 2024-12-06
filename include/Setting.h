@@ -35,8 +35,8 @@ public:
 	HWND hWnd_托盘;
 	HWND hWnd_设置;
 	HMENU hMenu;
-	LPTSTR Icon;
-	NOTIFYICONDATA nid = { 0 };
+	LPWSTR Icon;
+	NOTIFYICONDATAW nid = { 0 };
 	UINT WM_TASKBARCREATED;
 
 	Tstr 程序_名 = "Tools";
