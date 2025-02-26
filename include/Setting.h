@@ -5,92 +5,82 @@
 
 #include "resource.h"
 
-#include "Log.h" 
-
-#include "ToolsConfigFile.h"
-#include "Timers.h" 
-#include "CommonTools.h" 
-#include "WindowHosting.h"
-#include "Message.h"
-#include "Shell.h"
-#include "Hotkey.h"
-#include "Shell.h"
-
-#include <Windows.h>
-#include <string>
+#include "libTypical\Tool.h"
 
 using namespace Typical_Tool;
 using namespace Typical_Tool::WindowsSystem;
 using namespace Typical_Tool::StringManage;
-using Typical_Tool::WindowsSystem::WindowHosting;
-using Typical_Tool::WindowsSystem::WindowHotkey;
-
-#define _L(x) L ## x
+using Typical_Tool::WindowsSystem::WindowHost;
 
 class Settings {
 public:
 #define WM_TRAY WM_USER + 1
 	//窗口参数
 	HINSTANCE hIns;
-	HWND hWnd_托盘;
-	HWND hWnd_设置;
+	HWND hWnd_Tray;
+	HWND hWnd_Setting;
 	HMENU hMenu;
-	LPWSTR Icon;
-	NOTIFYICONDATAW nid = { 0 };
+	LPTSTR Icon;
+	NOTIFYICONDATA nid = { 0 };
 	UINT WM_TASKBARCREATED;
 
-	Tstr 程序_名 = "Tools";
-	const wchar_t* 程序_窗口类名 = L"Typical_Tools";
+	Tstr ExeName = Tx("Tools"); //程序名
+	Tstr ExeCurrentPath = FileSystem::GetCurrentPath(); //当前程序的工作路径
+	Tstr ExeWindowClassName = Tx("Typical_Tools"); //程序窗口类名
 	
-	Tstr 程序_托盘名 = "典型一号的工具箱";
-	Tstr 程序_标题栏名 = "典型一号的工具箱 v1.0_Plus";
+	Tstr ExeTrayName = Tx("典型一号的工具箱"); //程序托盘名
+	Tstr ExeTitleName = Tx("典型一号的工具箱 v1.0_Plus"); //程序标题栏名
 
 	//窗口操作
-	WinHost wh;
+	WindowHost wh;
 	WindowShell ws;
 
 	//设置
-	ConfigFileTextManage 配置文件;
-	Typical_Tool::ToolsConfigFile 工具箱配置文件;
-	std::map<Tstr, Tstr> 基本设置内容;
-	std::map<Tstr, std::map<Tstr, Tstr>> 配置文件全内容;
-	std::vector<ShellConfig> ShellConfig;
+	FileSystem FileSystem;
+	ConfigFileTextManage ConfigFile; //配置文件
+	std::map<Tstr, Tstr> BaseConfigItem; //[基本设置] 配置项
+	std::map<Tstr, std::map<Tstr, Tstr>> ConfigFile_AllConfig; //配置文件 全内容
+	std::vector<ShellConfig> ShellConfig; //[Shell] 配置项
 
-	bool 修改屏幕分辨率 = false;
+	bool SetScreenResolution = false; //修改屏幕分辨率
 
 	//菜单句柄
-	int ID_帮助;
-	int ID_退出;
-	int ID_工具箱设置;
-	int ID_修改屏幕分辨率;
+	int ID_Help; //帮助
+	int ID_Quit; //退出
+	int ID_ToolsConfig; //工具箱配置
+	int ID_SetScreenResolution; //修改屏幕分辨率
 
 	//快捷键
-	int 菜单_修改分辨率;
-	int 菜单_打开Repos;
-	int 菜单_打开Lib;
+	int Menu_ScreenResolution; //菜单 修改分辨率
 
 public:
 	Settings() {}
 };
 static Settings Tools;
 
-//更新配置文件内容
+//更新ConfigFile内容
 void UpdateConfig();
 
-/*
+/*Windows程序启动项
 * 单实例程序
 * 设置DPI
 * 保存进程句柄
 */
-int Windows程序启动项();
-void Windows窗口类注册();
-void Windows窗口创建();
+int WindowsExeAutoRunItem();
+//Windows窗口类注册
+void WindowsWindowClassRegister();
+//Windows窗口创建
+void WindowsWindowCreate();
 
-void 初始化();
-void 配置初始化();
+//[Shell] 配置初始化
+void ShellConfigInit();
+//[基本设置] 配置初始化
+void BaseConfigInit();
 
-void 菜单生成(HMENU 菜单);
-void 菜单选择(int 菜单选项ID);
+//菜单创建
+void CreateMenu(HMENU 菜单);
+//菜单选择
+void SelectMenu(int 菜单选项ID);
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

@@ -3,24 +3,24 @@
 
 #include "Setting.h"
 
-int APIENTRY wWinMain(
-    _In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR lpCmdLine,
-    _In_ int nShowCmd
-)
+
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
+#ifdef _DEBUG
+    Log::SetDebug(true);
+#endif
+    lgc.SetAllLogFileWrite(true, Tx("Tools"));
 #ifndef _DEBUG
-        lgcr.SetShowConsole(false);
+    Log::SetShowConsole(false);
 #endif
 
-    if (!Windows程序启动项()) {
+    if (!WindowsExeAutoRunItem()) {
         return 0;
     }
 
-    Windows窗口类注册();
+    WindowsWindowClassRegister();
 
-    Windows窗口创建();
+    WindowsWindowCreate();
 
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
@@ -28,5 +28,5 @@ int APIENTRY wWinMain(
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    return msg.wParam;
+    return static_cast<int>(msg.wParam);
 }

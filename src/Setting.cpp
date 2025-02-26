@@ -3,184 +3,37 @@
 #include "Setting.h"
 
 
-void 配置初始化()
+
+
+int WindowsExeAutoRunItem()
 {
-    lgc(_T("配置初始化()"));
-    Tools.配置文件.SetShowManageLog(true);
-    //先创建文件夹(否则后面的文件不能创建): \\Tools\\config
-    if (WindowsSystem::CreateFolder(Tools.工具箱配置文件.Get程序父文件夹路径() + _T("\\config"))) {
-        //文件不存在时，创建
-        if (!Tools.配置文件.Init(Tools.工具箱配置文件.Get工具箱配置文件路径()))
-        {
-            std::vector<Tstr> 区域内容;
-            区域内容.push_back(_T("原本屏幕分辨率宽=1920"));
-            区域内容.push_back(_T("原本屏幕分辨率高=1080"));
-            区域内容.push_back(_T("修改的屏幕分辨率宽=1280"));
-            区域内容.push_back(_T("修改的屏幕分辨率高=1024"));
-            区域内容.push_back(_T("Repos=C:\\Users\\22793\\source\\repos"));
-            区域内容.push_back(_T("Lib=C:\\Typical\\ProgramProject\\C++\\Libs"));
-            区域内容.push_back(_T("注册表开机自启动=否"));
-            区域内容.push_back(_T("文件夹快捷键=否"));
+    lgc(Tx("WindowsExeAutoRunItem()"));
 
-            std::vector<Tstr> ping_baidu;
-            ping_baidu.push_back(_T("菜单按键=是"));
-            ping_baidu.push_back(_T("模式=打开文件"));
-            ping_baidu.push_back(_T("文件=cmd"));
-            ping_baidu.push_back(_T("参数=/k ping -t www.baidu.com"));
-            ping_baidu.push_back(_T("显示窗口=是"));
-            std::vector<Tstr> 笔记本键盘开;
-            笔记本键盘开.push_back(_T("菜单按键=是"));
-            笔记本键盘开.push_back(_T("模式=管理员运行"));
-            笔记本键盘开.push_back(_T("文件=cmd"));
-            笔记本键盘开.push_back(_T("参数=sc config i8042prt start= auto"));
-            笔记本键盘开.push_back(_T("显示窗口=是"));
-            std::vector<Tstr> 笔记本键盘关;
-            笔记本键盘关.push_back(_T("菜单按键=是"));
-            笔记本键盘关.push_back(_T("模式=管理员运行"));
-            笔记本键盘关.push_back(_T("文件=cmd"));
-            笔记本键盘关.push_back(_T("参数=sc config i8042prt start= disabled"));
-            笔记本键盘关.push_back(_T("显示窗口=是"));
-
-            Tools.配置文件.AddConfig_FormatSampleText();
-            Tools.配置文件.AddConfig(_T("基本设置"), 区域内容);
-            //Tools.配置文件.AddConfig(_T("nvidia-smi"), nv_smi);
-            Tools.配置文件.AddConfig(_T("ping-baidu"), ping_baidu);
-            Tools.配置文件.AddConfig(_T("笔记本键盘开"), 笔记本键盘开);
-            Tools.配置文件.AddConfig(_T("笔记本键盘关"), 笔记本键盘关);
-            Tools.配置文件.WriteConfigFile();
-
-            //Tools.基本设置内容 = Tools.配置文件.GetConfig(_T("基本设置"));
-            //Tools.配置文件全内容 = Tools.配置文件.GetConfigMap();
-        }
-        else //文件存在
-        {
-            //Tools.基本设置内容 = Tools.配置文件.GetConfig(_T("基本设置"));
-            //Tools.配置文件全内容 = Tools.配置文件.GetConfigMap();
-        }
-
-        //Tools.配置文件.OutConfigFile_All();
-        //lgc("  Tools.配置文件全内容: [" + Tto_string(Tools.配置文件.GetConfigMap().size()) + "]");
-    }
-}
-
-void UpdateConfig()
-{
-    lgc(_T("UpdateConfig()"));
-
-    //获取更新后的配置文件
-    Tools.基本设置内容 = Tools.配置文件.GetConfig(_T("基本设置"));
-    Tools.配置文件全内容 = Tools.配置文件.GetConfigMap();
-
-    lgc(_T("find: 原本屏幕分辨率宽: ") + Tools.基本设置内容.find("原本屏幕分辨率宽")->second, lm::ts);
-    lgc(_T("find: 原本屏幕分辨率高: ") + Tools.基本设置内容.find("原本屏幕分辨率高")->second, lm::ts);
-    lgc(_T("find: 修改的屏幕分辨率宽: ") + Tools.基本设置内容.find("修改的屏幕分辨率宽")->second, lm::ts);
-    lgc(_T("find: 修改的屏幕分辨率高: ") + Tools.基本设置内容.find("修改的屏幕分辨率高")->second, lm::ts);
-    //lgc(_T("find: 笔记本键盘开关状态: ") + Tools.基本设置内容.find("笔记本键盘开关状态")->second, lm::ts);
-    lgc(_T("find: 设置_Repos: ") + Tools.基本设置内容.find("Repos")->second, lm::ts);
-    lgc(_T("find: 设置_Lib: ") + Tools.基本设置内容.find("Lib")->second, lm::ts);
-    lgc(_T("find: 设置_开机自启动: ") + Tools.基本设置内容.find("注册表开机自启动")->second, lm::ts);
-    lgc(_T("find: 设置_文件夹快捷键: ") + Tools.基本设置内容.find("文件夹快捷键")->second, lm::ts);
-
-    //lgc("  Tools.配置文件全内容: [" + Tto_string(Tools.配置文件.GetConfigMap().size()) + "]");
-}
-
-void 初始化()
-{
-    lgc(_T("初始化()"));
-
-    for (auto tempConfig = Tools.配置文件全内容.begin(); tempConfig != Tools.配置文件全内容.end(); tempConfig++) {
-        const Tstr Config = tempConfig->first;
-        
-        //执行Shell配置
-        if (Config != "基本设置") {
-            auto tempConfigItem_Invalid = tempConfig->second.end(); //无效配置项
-            std::map<Tstr, Tstr>::iterator tempConfigItem_Iter;
-
-            lgc("ShellConfig: [" + Config + "]");
-
-            Tstr 模式;
-            Tstr 文件;
-            Tstr 参数;
-            Tstr 显示窗口;
-            Tstr 菜单按键;
-
-            //读取配置信息
-            tempConfigItem_Iter = tempConfig->second.find(_T("模式"));
-            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
-                模式 = tempConfigItem_Iter->second;
-                lgc("  模式: " + 模式);
-            }
-            else {
-                lgcr("  ShellConfig: 没有 模式" + 模式, lm::wr);
-            }
-            tempConfigItem_Iter = tempConfig->second.find(_T("文件"));
-            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
-                文件 = tempConfigItem_Iter->second;
-                lgc("  文件: " + 文件);
-            }
-            else {
-                lgcr("  ShellConfig: 没有 文件" + 模式, lm::wr);
-            }
-            tempConfigItem_Iter = tempConfig->second.find(_T("参数"));
-            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
-                参数 = tempConfigItem_Iter->second;
-                lgc("  参数: " + 参数);
-            }
-            else {
-                lgcr("  ShellConfig: 没有 参数" + 模式, lm::wr);
-            }
-            tempConfigItem_Iter = tempConfig->second.find(_T("显示窗口"));
-            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
-                显示窗口 = tempConfigItem_Iter->second;
-                lgc("  显示窗口: " + 显示窗口);
-            }
-            else {
-                lgcr("  ShellConfig: 没有 显示窗口" + 模式, lm::wr);
-            }
-            tempConfigItem_Iter = tempConfig->second.find(_T("菜单按键"));
-            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
-                菜单按键 = tempConfigItem_Iter->second;
-                lgc("  菜单按键: " + 菜单按键);
-            }
-            else {
-                lgcr("  ShellConfig: 没有 菜单按键" + 模式, lm::wr);
-            }
-
-            Tools.ShellConfig.push_back(ShellConfig(Config, 模式, 文件, 参数, 显示窗口, 菜单按键));
-        }
-        else {
-            lgc("OtherConfig: [" + Config + "]");
-        }
-    }
-}
-
-int Windows程序启动项()
-{
-    lgc(_T("Windows程序启动项()"));
-
-    WinSys::WindowDPI();
-    if (WinSys::单实例运行(wtos(Tools.程序_窗口类名), Tools.程序_标题栏名) == 0) {
+    Win::WindowDPI();
+    if (Win::AloneRun(Tools.ExeWindowClassName, Tools.ExeTitleName) == 0) {
         return 0;
     }
 
-    Tools.工具箱配置文件.初始化(Tools.程序_名);
-    配置初始化();
+    BaseConfigInit();
     UpdateConfig();
 
-    if (Tools.基本设置内容.find("注册表开机自启动")->second == _T("否")) {
-        lgc(_T("工具箱注册开机自启动: 不需要"), lm::wr);
+    if (Tools.BaseConfigItem[Tx("注册表开机自启动")] == Tx("否")) {
+        lgc(Tx("工具箱注册开机自启动: 不需要"), War);
     }
     else {
-        if (SetAutoRun(_T("典型一号的工具箱"), Tools.工具箱配置文件.Get程序路径().c_str())) {
-            lgc(_T("典型一号的工具箱注册开机自启动 成功!"), lm::wr);
-        }
-        else {
-            lgc(_T("典型一号的工具箱注册开机自启动 失败!"), lm::wr);
+        Tstr ExePathName;
+        if (Win::GetExePathName(ExePathName)) {
+            if (Win::SetSelfStarting(Tx("典型一号的工具箱"), ExePathName)) {
+                lgc(Tx("典型一号的工具箱注册开机自启动 成功!"), War);
+            }
+            else {
+                lgc(Tx("典型一号的工具箱注册开机自启动 失败!"), War);
+            }
         }
     }
-    初始化();
+    ShellConfigInit();
 
-    Tools.Icon = (LPWSTR)IDI_ICON256X;
+    Tools.Icon = (LPTSTR)IDI_ICON256X;
     Tools.hIns = GetModuleHandle(NULL);
 
     HFONT Font = CreateFont(
@@ -193,187 +46,322 @@ int Windows程序启动项()
         FF_DONTCARE,
         TEXT("微软雅黑")
     );
-    Tools.wh.设置字体(Font);
-    
+    Tools.wh.SetFont(Font);
+
     return 1;
 }
 
-
-void Windows窗口类注册()
+void BaseConfigInit()
 {
-    lgc(_T("Windows窗口类注册()"));
+    lgc(Tx("BaseConfigInit()"));
+    //先创建文件夹(否则后面的文件不能创建): \\Tools\\Config
+    Tstr ConfigDirectory = Format(Tx("%\\Config"), Tools.ExeCurrentPath).str();
+    Tools.FileSystem.SetPath(ConfigDirectory);
+    if (Tools.FileSystem.CreateDirectorys()) {
+        //文件不存在时，创建
+#ifdef _DEBUG
+        Tools.ConfigFile.SetShowManageLog(true);
+#endif
+        if (!Tools.ConfigFile.Init(Format(Tx("%%"), ConfigDirectory, Tx("\\Config.ini")))) {
+            lg(Format(Tx("配置文件初始化: [%]"), Tools.ConfigFile.GetConfigFilePath()));
 
-    WNDCLASSW wndclass = { 0 };
+            std::vector<Tstr> BaseConfig;
+            BaseConfig.push_back(Tx("原本屏幕分辨率宽=1920"));
+            BaseConfig.push_back(Tx("原本屏幕分辨率高=1080"));
+            BaseConfig.push_back(Tx("修改的屏幕分辨率宽=1280"));
+            BaseConfig.push_back(Tx("修改的屏幕分辨率高=1024"));
+            BaseConfig.push_back(Tx("注册表开机自启动=否"));
+            BaseConfig.push_back(Tx("文件夹快捷键=否"));
+
+            std::vector<Tstr> ping_baidu;
+            ping_baidu.push_back(Tx("菜单按键=是"));
+            ping_baidu.push_back(Tx("模式=打开文件"));
+            ping_baidu.push_back(Tx("文件=cmd"));
+            ping_baidu.push_back(Tx("参数=/k ping -t www.baidu.com"));
+            ping_baidu.push_back(Tx("显示窗口=是"));
+            std::vector<Tstr> BookKeyOn;
+            BookKeyOn.push_back(Tx("菜单按键=是"));
+            BookKeyOn.push_back(Tx("模式=管理员运行"));
+            BookKeyOn.push_back(Tx("文件=cmd"));
+            BookKeyOn.push_back(Tx("参数=/k sc config i8042prt start= auto"));
+            BookKeyOn.push_back(Tx("显示窗口=是"));
+            std::vector<Tstr> BookKeyOff;
+            BookKeyOff.push_back(Tx("菜单按键=是"));
+            BookKeyOff.push_back(Tx("模式=管理员运行"));
+            BookKeyOff.push_back(Tx("文件=cmd"));
+            BookKeyOff.push_back(Tx("参数=/k sc config i8042prt start= disabled"));
+            BookKeyOff.push_back(Tx("显示窗口=是"));
+
+            Tools.ConfigFile.AddConfig_FormatSampleText();
+            Tools.ConfigFile.AddConfig(Tx("基本设置"), BaseConfig);
+            //Tools.ConfigFile.AddConfig(Tx("nvidia-smi"), nv_smi);
+            Tools.ConfigFile.AddConfig(Tx("ping-baidu"), ping_baidu);
+            Tools.ConfigFile.AddConfig(Tx("笔记本键盘开"), BookKeyOn);
+            Tools.ConfigFile.AddConfig(Tx("笔记本键盘关"), BookKeyOff);
+            Tools.ConfigFile.WriteConfigFile();
+
+        }
+        else { //文件存在
+        }
+    }
+    else {
+#ifdef _DEBUG
+        Tools.ConfigFile.SetShowManageLog(true);
+#endif
+        if (!Tools.ConfigFile.Init(Format(Tx("%%"), ConfigDirectory, Tx("\\Config.ini")))) {
+            lgc(Err, Format(Tx("读取文件[%%]失败!"), ConfigDirectory, Tx("\\Config.ini")));
+        }
+        else {
+            lgc(Tip, Format(Tx("读取文件[%%]成功!"), ConfigDirectory, Tx("\\Config.ini")));
+        }
+    }
+}
+
+void UpdateConfig()
+{
+    lgc(Tx("UpdateConfig()"));
+
+    //获取更新后的ConfigFile
+    Tools.BaseConfigItem = Tools.ConfigFile.GetConfigItem(Tx("基本设置"));
+    Tools.ConfigFile_AllConfig = Tools.ConfigFile.GetConfigMap();
+
+    lgc(Tip, Format(Tx("\t原本屏幕分辨率宽: %"), Tools.BaseConfigItem[Tx("原本屏幕分辨率宽")]));
+    lgc(Tip, Format(Tx("\t原本屏幕分辨率高: %"), Tools.BaseConfigItem[Tx("原本屏幕分辨率高")]));
+    lgc(Tip, Format(Tx("\t修改的屏幕分辨率宽: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率宽")]));
+    lgc(Tip, Format(Tx("\t修改的屏幕分辨率高: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率高")]));
+    lgc(Tip, Format(Tx("\t设置_开机自启动: %"), Tools.BaseConfigItem[Tx("注册表开机自启动")]));
+    lgc(Tip, Format(Tx("\t设置_文件夹快捷键: %"), Tools.BaseConfigItem[Tx("文件夹快捷键")]));
+
+    lgc(Format(Tx("  Tools.ConfigFile 所有配置: [%]"), ToStr(Tools.ConfigFile.GetConfigMap().size())));
+}
+
+void ShellConfigInit()
+{
+    lgc(Tx("ShellConfigInit()"));
+
+    for (auto tempConfig = Tools.ConfigFile_AllConfig.begin(); tempConfig != Tools.ConfigFile_AllConfig.end(); tempConfig++) {
+        const Tstr Config = tempConfig->first;
+        
+        //执行Shell配置
+        if (Config != Tx("基本设置")) {
+            auto tempConfigItem_Invalid = tempConfig->second.end(); //无效配置项
+            std::map<Tstr, Tstr>::iterator tempConfigItem_Iter;
+
+            lgc(Format(Tx("ShellConfig: [%]"), Config));
+
+            Tstr OperateMode;
+            Tstr File;
+            Tstr Args;
+            Tstr WindowShow;
+            Tstr MenuButton;
+
+            //读取配置信息
+            tempConfigItem_Iter = tempConfig->second.find(Tx("模式"));
+            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
+                OperateMode = tempConfigItem_Iter->second;
+                lgc(Format(Tx("  操作模式: [%]"), OperateMode));
+            }
+            else {
+                lgcr(Format(Tx("  ShellConfig: 没有 操作模式 [%]"), OperateMode), War);
+            }
+            tempConfigItem_Iter = tempConfig->second.find(Tx("文件"));
+            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
+                File = tempConfigItem_Iter->second;
+                lgc(Format(Tx("  文件: %"), File));
+            }
+            else {
+                lgcr(Format(Tx("  ShellConfig: 没有 文件 [%]"), OperateMode), War);
+            }
+            tempConfigItem_Iter = tempConfig->second.find(Tx("参数"));
+            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
+                Args = tempConfigItem_Iter->second;
+                lgc(Format(Tx("  参数: %"), Args));
+            }
+            else {
+                lgcr(Format(Tx("  ShellConfig: 没有 参数 [%]"), OperateMode), War);
+            }
+            tempConfigItem_Iter = tempConfig->second.find(Tx("显示窗口"));
+            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
+                WindowShow = tempConfigItem_Iter->second;
+                lgc(Format(Tx("  显示窗口: [%]"), WindowShow));
+            }
+            else {
+                lgcr(Format(Tx("  ShellConfig: 没有 显示窗口 [%]"), OperateMode), War);
+            }
+            tempConfigItem_Iter = tempConfig->second.find(Tx("菜单按键"));
+            if (tempConfigItem_Invalid != tempConfigItem_Iter) {
+                MenuButton = tempConfigItem_Iter->second;
+                lgc(Format(Tx("  菜单按键: [%]"), MenuButton));
+            }
+            else {
+                lgcr(Format(Tx("  ShellConfig: 没有 菜单按键 [%]"), OperateMode), War);
+            }
+
+            Tools.ShellConfig.push_back(ShellConfig(Config, OperateMode, File, Args, WindowShow, MenuButton));
+        }
+        else {
+            lgc(Format(Tx("OtherConfig: [%]"), Config));
+        }
+    }
+}
+
+
+
+void WindowsWindowClassRegister()
+{
+    lgc(Tx("WindowsWindowClassRegister()"));
+
+    WNDCLASS wndclass = { 0 };
     wndclass.style = CS_HREDRAW | CS_VREDRAW;
     wndclass.lpfnWndProc = WndProc;
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = Tools.hIns;
-    wndclass.hIcon = LoadIconW(Tools.hIns, Tools.Icon);
+    wndclass.hIcon = LoadIcon(Tools.hIns, Tools.Icon);
     wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
     wndclass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wndclass.lpszMenuName = NULL;
-    wndclass.lpszClassName = Tools.程序_窗口类名;
-    Tools.wh.注册窗口类(wndclass);
-
-    WinHost::注册进度条窗口类();
+    wndclass.lpszClassName = Tools.ExeWindowClassName.c_str();
+    Tools.wh.RegisterWindowClass(wndclass);
 }
 
-void Windows窗口创建()
+void WindowsWindowCreate()
 {
-    lgc(_T("Windows窗口创建()"));
+    lgc(Tx("WindowsWindowCreate()"));
 
     //窗口创建时会产生消息: WM_CREATE
-    //要在 WM_CREATE 之前设置好菜单选项的 ID
+    //要在 WM_CREATE 之前设置好Menu选项的 ID
     //按键
-    Tools.ID_修改屏幕分辨率 = WindowHosting::GetHMENU();
+    Tools.ID_SetScreenResolution = WindowHost::GetHMENU();
 
-    Tools.hWnd_托盘 = CreateWindowExW(
+    Tools.hWnd_Tray = CreateWindowEx(
     // 此处使用WS_EX_TOOLWINDOW 属性来隐藏显示在任务栏上的窗口程序按钮  
         WS_EX_TOOLWINDOW,
         //0,
-        Tools.程序_窗口类名, stow(Tools.程序_标题栏名).c_str(),
+        Tools.ExeWindowClassName.c_str(), Tools.ExeTitleName.c_str(),
         WS_POPUP,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         NULL, NULL, Tools.hIns, NULL);
-    Tools.wh.添加窗口托管("hWnd_托盘", Tools.hWnd_托盘);
+    Tools.wh.AddWindowHost(Tx("hWnd_Tray"), Tools.hWnd_Tray);
 
     // 不要修改TaskbarCreated，这是系统任务栏自定义的消息  
-    Tools.WM_TASKBARCREATED = RegisterWindowMessageW(L"TaskbarCreated");
+    Tools.WM_TASKBARCREATED = RegisterWindowMessage(Tx("TaskbarCreated"));
 }
 
-void 菜单生成(HMENU 菜单)
+void CreateMenu(HMENU Menu)
 {
-    //为菜单添加选项  
-    AppendMenuW(菜单, MF_STRING, Tools.ID_修改屏幕分辨率, _L("修改屏幕分辨率"));
-    AppendMenuW(菜单, MF_SEPARATOR, NULL, _L("分割线"));
+    //为Menu添加选项  
+    AppendMenu(Menu, MF_STRING, Tools.ID_SetScreenResolution, Tx("修改屏幕分辨率"));
+    AppendMenu(Menu, MF_SEPARATOR, NULL, Tx("分割线"));
 
-    //Shell插入位置: 菜单项总数 - 4
-    Tools.ws.Shell处理(菜单, Tools.ShellConfig);
-    Tools.ws.执行程序启动项Shell();
+    //Shell插入位置: Menu项总数 - 4
+    Tools.ws.ShellOperate(Menu, Tools.ShellConfig);
+    Tools.ws.ExeRunItemShell();
 
-    Tools.ID_工具箱设置 = WindowHosting::GetHMENU();
-    Tools.ID_帮助 = WindowHosting::GetHMENU();
-    Tools.ID_退出 = WindowHosting::GetHMENU();
+    Tools.ID_ToolsConfig = WindowHost::GetHMENU();
+    Tools.ID_Help = WindowHost::GetHMENU();
+    Tools.ID_Quit = WindowHost::GetHMENU();
 
-    AppendMenuW(菜单, MF_SEPARATOR, NULL, _L("分割线"));
-    AppendMenuW(菜单, MF_STRING, Tools.ID_工具箱设置, _L("配置"));
-    AppendMenuW(菜单, MF_STRING, Tools.ID_帮助, _L("帮助"));
-    AppendMenuW(菜单, MF_STRING, Tools.ID_退出, _L("退出"));
+    AppendMenu(Menu, MF_SEPARATOR, NULL, Tx("分割线"));
+    AppendMenu(Menu, MF_STRING, Tools.ID_ToolsConfig, Tx("配置"));
+    AppendMenu(Menu, MF_STRING, Tools.ID_Help, Tx("帮助"));
+    AppendMenu(Menu, MF_STRING, Tools.ID_Quit, Tx("退出"));
 
-    Tools.菜单_修改分辨率 = WindowHotkey::GetHotkey();
-    Tools.菜单_打开Repos = WindowHotkey::GetHotkey();
-    Tools.菜单_打开Lib = WindowHotkey::GetHotkey();
+    Tools.Menu_ScreenResolution = WindowHost::GetHMENU();
 
-    热键注册消息 热键注册_修改分辨率("Ctrl + Alt + F9", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_修改分辨率, MOD_CONTROL | MOD_ALT, VK_F9));
-    热键注册消息 热键注册_打开Repos("Ctrl + Alt + F10", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Repos, MOD_CONTROL | MOD_ALT, VK_F10));
-    热键注册消息 热键注册_打开Lib("Ctrl + Alt + F11", RegisterHotKey(Tools.hWnd_托盘, Tools.菜单_打开Lib, MOD_CONTROL | MOD_ALT, VK_F11));
+    //Win::RegisterHotKeyMessage RegisterHotKey_SetScreenResolution(Tx("Ctrl + Alt + F9"), RegisterHotKey(Tools.hWnd_Tray, Tools.Menu_ScreenResolution, MOD_CONTROL | MOD_ALT, VK_F9));
 }
 
-void 菜单选择(int 菜单选项ID)
+void SelectMenu(int MenuItemID)
 {
-    if (菜单选项ID == Tools.ID_工具箱设置)
+    if (MenuItemID == Tools.ID_ToolsConfig)
     {
-        lgc(_T("菜单选项ID: ID_工具箱设置 Path: " + Tools.工具箱配置文件.Get工具箱配置文件路径()));
+        lg(Format(Tx("菜单项ID: ID_ToolsConfig Path: [%]"), Tools.ConfigFile.GetConfigFilePath()));
 
-        Tools.ws.ExecuteAnalyze("打开配置文件", "打开文件", Tools.工具箱配置文件.Get工具箱配置文件路径());
-        lgr(_T("修改后需要重启程序!"));
+        Tools.ws.ExecuteAnalyze(Tx("打开配置文件"), Tx("打开文件"), Tools.ConfigFile.GetConfigFilePath());
+        lgr(Tx("修改后需要重启程序!"));
     }
-    else if (菜单选项ID == Tools.ID_修改屏幕分辨率)
+    else if (MenuItemID == Tools.ID_SetScreenResolution)
     {
-        lgc(_T("菜单选项ID: ID_修改屏幕分辨率"));
-        if (Tools.修改屏幕分辨率)
+        lg(Tx("菜单项ID: ID_SetScreenResolution"));
+        if (Tools.SetScreenResolution)
         {
-            //修改屏幕分辨率
+            //SetScreenResolution
             SetDisplaySize(
-                std::stoi(Tools.基本设置内容.find("原本屏幕分辨率宽")->second),
-                std::stoi(Tools.基本设置内容.find("原本屏幕分辨率高")->second)
+                std::stoi(Tools.BaseConfigItem.find(Tx("原本屏幕分辨率宽"))->second),
+                std::stoi(Tools.BaseConfigItem.find(Tx("原本屏幕分辨率高"))->second)
             );
-            Tools.修改屏幕分辨率 = false;
+            Tools.SetScreenResolution = false;
 
-            lgc((Tools.基本设置内容.find("原本屏幕分辨率宽")->second + _T(" x ") + Tools.基本设置内容.find("原本屏幕分辨率高")->second), _T("屏幕分辨率修改成功"));
+            lgc(Tip, Format(Tx("屏幕分辨率修改成功:\n[%] x [%]"), Tools.BaseConfigItem.find(Tx("原本屏幕分辨率宽"))->second, Tools.BaseConfigItem.find(Tx("原本屏幕分辨率高"))->second));
         }
         else
         {
-            //修改屏幕分辨率
+            //SetScreenResolution
             SetDisplaySize(
-                std::stoi(Tools.基本设置内容.find("修改的屏幕分辨率宽")->second),
-                std::stoi(Tools.基本设置内容.find("修改的屏幕分辨率高")->second)
+                std::stoi(Tools.BaseConfigItem.find(Tx("修改的屏幕分辨率宽"))->second),
+                std::stoi(Tools.BaseConfigItem.find(Tx("修改的屏幕分辨率高"))->second)
             );
-            Tools.修改屏幕分辨率 = true;
+            Tools.SetScreenResolution = true;
 
-            lgc((Tools.基本设置内容.find("修改的屏幕分辨率宽")->second + _T(" x ") + Tools.基本设置内容.find("修改的屏幕分辨率高")->second), _T("屏幕分辨率修改成功"));
+            lgc(Tip, Format(Tx("屏幕分辨率修改成功:\n[%] x [%]"), Tools.BaseConfigItem.find(Tx("修改的屏幕分辨率宽"))->second, Tools.BaseConfigItem.find(Tx("修改的屏幕分辨率高"))->second));
         }
     }
-    else if (菜单选项ID == Tools.ID_帮助)
+    else if (MenuItemID == Tools.ID_Help)
     {
-        lgc(_T("菜单选项ID: ID_帮助"));
-        MessageBoxW(NULL, _L("分辨率:\t分辨率宽高最好是成比例(避免无效)\n\
-\t例如:\n\
-\t16:9 1920x1080\n\
-\t4:3  1280x960\n\
-\n快捷键:\t  Ctrl + Alt + F9: 修改分辨率\n\
-\t  Ctrl + Alt + F10: 打开 Repos 文件夹\n\
-\t  Ctrl + Alt + F11: 打开 Lib 文件夹\n\
-(需要在配置文件中修改: 文件夹快捷键=是)\n\
-"), _L("快捷键帮助"), NULL);
+        lgc(Tx("菜单项ID: ID_Help"));
+        MessageBox(NULL, Tx("分辨率: 宽高比例请在系统设置中查看!\n\t(设置->系统->屏幕->缩放和布局->显示器分辨率)\n\
+"), Tx("快捷键帮助"), NULL);
     }
 
-    else if (菜单选项ID == Tools.ID_退出)
+    else if (MenuItemID == Tools.ID_Quit)
     {
-        lgc(_T("菜单选项ID: ID_退出"));
+        lgc(Tx("菜单项ID: ID_Quit"));
         PostQuitMessage(0);
     }
     else {
-        Tools.ws.执行程序菜单项Shell(菜单选项ID);
+        Tools.ws.ExeMenuItemShell(MenuItemID);
     }
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    int wmId, wmEvent;
+    //int wmId;
+    //int wmEvent;
 
     POINT pt; //用于接收鼠标坐标  
-    int 菜单选项ID; //用于接收菜单选项返回值  
+    int MenuItemID; //用于接收Menu选项返回值  
 
     switch (uMsg)
     {
     case WM_CREATE: //窗口创建时候的消息.  
     {
-        lgc(_T("WndProc::WM_CREATE"));
+        lgc(Tx("WndProc::WM_CREATE"));
         
         // NOTIFYICONDATA: 用于与任务栏通知区域（也称为系统托盘）中的图标进行交互
-        Tools.nid.cbSize = sizeof(NOTIFYICONDATAW);
+        Tools.nid.cbSize = sizeof(NOTIFYICONDATA);
         // hWnd: 传入的 hWnd, 否则 Shell_NotifyIcon添加托盘图标时会报错: 2147500037
         Tools.nid.hWnd = hWnd;
         Tools.nid.uID = 1;
         Tools.nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP | NIF_SHOWTIP;
         Tools.nid.uCallbackMessage = WM_TRAY;
-        Tools.nid.hIcon = LoadIconW(Tools.hIns, MAKEINTRESOURCEW(Tools.Icon));
+        Tools.nid.hIcon = LoadIcon(Tools.hIns, MAKEINTRESOURCE(Tools.Icon));
         if (Tools.nid.hIcon == NULL) {
-            lg(_T("菜单图标资源无效!"), lm::er);
+            lg(Tx("菜单图标资源无效!"), Err);
         }
-        lstrcpyW(Tools.nid.szTip, stow(Tools.程序_托盘名).c_str());
+        lstrcpy(Tools.nid.szTip, Tools.ExeTrayName.c_str());
 
-        Tools.hMenu = CreatePopupMenu(); //生成菜单
+        Tools.hMenu = CreatePopupMenu(); //生成Menu
 
-        菜单生成(Tools.hMenu);
+        CreateMenu(Tools.hMenu);
 
-        //lgc(_T("Shell_NotifyIcon之前 ErrorCode:") + Tto_string(GetLastError()), lm::er);
-        if (!Shell_NotifyIconW(NIM_ADD, &Tools.nid)) {
-            lgc("Shell_NotifyIcon ErrorCode:" + Tto_string(GetLastError()), lm::er);
+        //lgc(Tx("Shell_NotifyIcon之前 ErrorCode:") + ToStr(GetLastError()), Err);
+        if (!Shell_NotifyIcon(NIM_ADD, &Tools.nid)) {
+            lgc(Format(Tx("Shell_NotifyIcon ErrorCode: [%]"), ToStr(GetLastError())), Err);
         }
-
-        /*Tchar tempMenuStr[MAX_PATH] = _T("");
-        for (int i = 0; i < GetMenuItemCount(Tools.hMenu); i++) {
-            if (GetMenuString(Tools.hMenu, i, tempMenuStr, sizeof(tempMenuStr) / sizeof (Tchar*), MF_BYPOSITION)) {
-                lgc(_T("菜单选项ID: ") + Tto_string(i), lm::wr);
-                lgc(_T("菜单选项字符串: ") + (Tstr)tempMenuStr, lm::wr);
-            }
-        }*/
 
         break;
     }
@@ -383,19 +371,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
         case WM_RBUTTONDOWN:
         {
-            //lgc(_T("按下鼠标右键"));
+            //lgc(Tx("按下鼠标右键"));
             GetCursorPos(&pt); //取鼠标坐标  
-            ::SetForegroundWindow(hWnd); //解决在菜单外单击左键菜单不消失的问题  
-            //EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED); //让菜单中的某一项变灰
+            ::SetForegroundWindow(hWnd); //解决在Menu外单击左键Menu不消失的问题  
+            //EnableMenuItem(hmenu, IDR_PAUSE, MF_GRAYED); //让Menu中的某一项变灰
 
-            菜单选项ID = TrackPopupMenu(Tools.hMenu, TPM_RIGHTBUTTON | TPM_RETURNCMD,
-                pt.x, pt.y, 0, hWnd, NULL); //显示菜单并获取选项ID 
-            //lgc(_T("菜单选项ID: ") + Tto_string(菜单选项ID), lm::wr);
-            if (菜单选项ID == 0) {
-                lgc(_T("TrackPopupMenu: ") + Tto_string(GetLastError()), lm::er);
+            MenuItemID = TrackPopupMenu(Tools.hMenu, TPM_RIGHTBUTTON | TPM_RETURNCMD,
+                pt.x, pt.y, 0, hWnd, NULL); //显示Menu并获取选项ID 
+            //lgc(Tx("MenuItemID: ") + ToStr(MenuItemID), War);
+            if (MenuItemID == 0) {
+                lgc(Tx("TrackPopupMenu: ") + ToStr(GetLastError()), Err);
             }
 
-            菜单选择(菜单选项ID);
+            SelectMenu(MenuItemID);
             
             break;
         }
@@ -404,49 +392,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     case WM_HOTKEY:
     {        
-        lgc("快捷键: WM_HOTKEY");
+        //lgc(Tx("快捷键: WM_HOTKEY"));
 
         //按键消息为: Ctrl+Alt+F9 时: 修改屏幕分辨率
-        if (Tools.菜单_修改分辨率 == wParam)
+        if (Tools.Menu_ScreenResolution == wParam)
         {
-            lgc(_T("快捷键: 修改分辨率"));
-            if (Tools.修改屏幕分辨率)
+            lgc(Tx("快捷键: 修改分辨率"));
+            if (Tools.SetScreenResolution)
             {
-                //修改屏幕分辨率
+                //SetScreenResolution
                 SetDisplaySize(
-                    std::stoi(Tools.基本设置内容.find("原本屏幕分辨率宽")->second),
-                    std::stoi(Tools.基本设置内容.find("原本屏幕分辨率高")->second)
+                    std::stoi(Tools.BaseConfigItem[Tx("原本屏幕分辨率宽")]),
+                    std::stoi(Tools.BaseConfigItem[Tx("原本屏幕分辨率高")])
                 );
-                Tools.修改屏幕分辨率 = false;
+                Tools.SetScreenResolution = false;
 
-                lgc((Tools.基本设置内容.find("原本屏幕分辨率宽")->second + _T(" x ") + Tools.基本设置内容.find("原本屏幕分辨率高")->second), _T("屏幕分辨率修改成功"));
+                lgc(Format(Tx("屏幕分辨率修改成功:\n[%] x [%]"), Tools.BaseConfigItem[Tx("原本屏幕分辨率宽")], Tools.BaseConfigItem[Tx("原本屏幕分辨率高")]));
             }
             else
             {
-                //修改屏幕分辨率
+                //SetScreenResolution
                 SetDisplaySize(
-                    std::stoi(Tools.基本设置内容.find("修改的屏幕分辨率宽")->second),
-                    std::stoi(Tools.基本设置内容.find("修改的屏幕分辨率高")->second)
+                    std::stoi(Tools.BaseConfigItem[Tx("修改的屏幕分辨率宽")]),
+                    std::stoi(Tools.BaseConfigItem[Tx("修改的屏幕分辨率高")])
                 );
-                Tools.修改屏幕分辨率 = true;
+                Tools.SetScreenResolution = true;
 
-                lgc((Tools.基本设置内容.find("修改的屏幕分辨率宽")->second + _T(" x ") + Tools.基本设置内容.find("修改的屏幕分辨率高")->second), _T("屏幕分辨率修改成功"));
-            }
-        }
-        //按键消息为: Ctrl+Alt+F10 时: 打开 repos 文件夹
-        if (Tools.菜单_打开Repos == wParam)
-        {
-            lgc(_T("快捷键: 打开Repos"));
-            if (Tools.基本设置内容.find("文件夹快捷键")->second == "是") {
-                Shell消息 temp(_T("Repos"), (int)ShellExecute(NULL, _T("explore"), Tools.基本设置内容.find("Repos")->second.c_str(), NULL, NULL, SW_SHOWNORMAL));
-            }
-        }
-        //按键消息为: Ctrl+Alt+F11 时: 打开 Lib 文件夹
-        if (Tools.菜单_打开Lib == wParam)
-        {
-            lgc(_T("快捷键: 打开Lib"));
-            if (Tools.基本设置内容.find("文件夹快捷键")->second == "是") {
-                Shell消息 temp(_T("Lib"), (int)ShellExecute(NULL, _T("explore"), Tools.基本设置内容.find("Lib")->second.c_str(), NULL, NULL, SW_SHOWNORMAL));
+                lgc(Format(Tx("屏幕分辨率修改成功:\n[%] x [%]"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率宽")], Tools.BaseConfigItem[Tx("修改的屏幕分辨率高")]));
             }
         }
 
@@ -454,7 +426,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
     case WM_DESTROY: //窗口销毁时候的消息.  
     {
-        Shell_NotifyIconW(NIM_DELETE, &Tools.nid);
+        Shell_NotifyIcon(NIM_DELETE, &Tools.nid);
         PostQuitMessage(0);
         break;
     }
