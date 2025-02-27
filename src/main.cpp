@@ -8,9 +8,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 {
 #ifdef _DEBUG
     Log::SetDebug(true);
-#endif
+    lgc.SetAllLogFileWrite(true, Tx("Tools"), 0);
+#else
     lgc.SetAllLogFileWrite(true, Tx("Tools"));
-#ifndef _DEBUG
     Log::SetShowConsole(false);
 #endif
 

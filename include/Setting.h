@@ -21,7 +21,7 @@ public:
 	HWND hWnd_Setting;
 	HMENU hMenu;
 	LPTSTR Icon;
-	NOTIFYICONDATA nid = { 0 };
+	NOTIFYICONDATA Nid = { 0 };
 	UINT WM_TASKBARCREATED;
 
 	Tstr ExeName = Tx("Tools"); //程序名
@@ -32,8 +32,8 @@ public:
 	Tstr ExeTitleName = Tx("典型一号的工具箱 v1.0_Plus"); //程序标题栏名
 
 	//窗口操作
-	WindowHost wh;
-	WindowShell ws;
+	WindowHost WindowHost;
+	WindowShell WindowShell;
 
 	//设置
 	FileSystem FileSystem;
@@ -72,13 +72,13 @@ void WindowsWindowClassRegister();
 //Windows窗口创建
 void WindowsWindowCreate();
 
-//[Shell] 配置初始化
-void ShellConfigInit();
-//[基本设置] 配置初始化
-void BaseConfigInit();
+//[Shell] 加载配置: 初始化/载入
+void LoadShellConfig();
+//[基本设置] 加载配置: 初始化/载入
+void LoadBaseConfig(bool _bReLoad = false);
 
-//菜单创建
-void CreateMenu(HMENU 菜单);
+//加载菜单: 初始化/载入
+void LoadToolsMenu(HMENU 菜单);
 //菜单选择
 void SelectMenu(int 菜单选项ID);
 
