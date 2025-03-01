@@ -3,7 +3,31 @@
 #include "Setting.h"
 
 
+void SelfStarting()
+{
+    Tstr ExePathName;
+    if (Win::GetExePathName(ExePathName)) {
+        if (Tools.BaseConfigItem[Tx("注册表开机自启动")] == Tx("否")) {
+            lgc(Tx("注册开机自启动: 否"), Tip);
 
+            if (Win::SetSelfStarting((Tstr)Tx("Typical_Tools"), Format(Tx("\"%\""), ExePathName).str(), false)) {
+                lgc(Tx("注册开机自启动: 删除成功!"), Tip);
+            }
+            else {
+                lgcr(Tx("注册开机自启动: 删除失败!"), Err);
+            }
+        }
+        else {
+            lgc(Tx("注册开机自启动: 是"), Tip);
+            if (Win::SetSelfStarting((Tstr)Tx("Typical_Tools"), Format(Tx("\"%\""), ExePathName).str(), true)) {
+                lgc(Tx("注册开机自启动: 添加成功!"), Tip);
+            }
+            else {
+                lgcr(Tx("注册开机自启动: 添加失败!"), Err);
+            }
+        }
+    }
+}
 
 int WindowsExeAutoRunItem()
 {
@@ -16,20 +40,7 @@ int WindowsExeAutoRunItem()
 
     LoadBaseConfig();
 
-    if (Tools.BaseConfigItem[Tx("注册表开机自启动")] == Tx("否")) {
-        lgc(Tx("工具箱注册开机自启动: 不需要"), War);
-    }
-    else {
-        Tstr ExePathName;
-        if (Win::GetExePathName(ExePathName)) {
-            if (Win::SetSelfStarting(Tx("典型一号的工具箱"), ExePathName)) {
-                lgc(Tx("典型一号的工具箱注册开机自启动 成功!"), War);
-            }
-            else {
-                lgcr(Tx("典型一号的工具箱注册开机自启动 失败!"), War);
-            }
-        }
-    }
+    SelfStarting();
     LoadShellConfig();
 
     Tools.Icon = (LPTSTR)IDI_ICON256X;
@@ -61,14 +72,16 @@ void LoadBaseConfig(bool _bReLoad)
     }
 
     //先创建文件夹(否则后面的文件不能创建): \\Tools\\Config
-    Tstr ConfigDirectory = Format(Tx("%\\Config"), Tools.ExeCurrentPath).str();
+    //Tstr ConfigDirectory = Format(Tx("%\\Config"), Tools.ExeCurrentPath);
+    Tstr ConfigDirectory = Format(Tx("Config"));
+    Tools.ExeConfigFilePath = Format(Tx("%%"), ConfigDirectory, Tx("\\Config.ini"));
     Tools.FileSystem.SetPath(ConfigDirectory);
     if (Tools.FileSystem.CreateDirectorys()) {
         //文件不存在时，创建
 #ifdef _DEBUG
         Tools.ConfigFile.SetShowManageLog(true);
 #endif
-        if (!Tools.ConfigFile.Init(Format(Tx("%%"), ConfigDirectory, Tx("\\Config.ini")))) {
+        if (!Tools.ConfigFile.Init(Format(Tx("%"), Tools.ExeConfigFilePath))) {
             lg(Format(Tx("配置文件初始化: [%]"), Tools.ConfigFile.GetConfigFilePath()));
 
             std::vector<Tstr> BaseConfig;
@@ -77,7 +90,7 @@ void LoadBaseConfig(bool _bReLoad)
             BaseConfig.push_back(Tx("修改的屏幕分辨率宽=1280"));
             BaseConfig.push_back(Tx("修改的屏幕分辨率高=1024"));
             BaseConfig.push_back(Tx("注册表开机自启动=否"));
-            BaseConfig.push_back(Tx("文件夹快捷键=否"));
+            //BaseConfig.push_back(Tx("文件夹快捷键=否"));
 
             std::vector<Tstr> ping_baidu;
             ping_baidu.push_back(Tx("菜单按键=是"));
@@ -114,14 +127,15 @@ void LoadBaseConfig(bool _bReLoad)
 #ifdef _DEBUG
         Tools.ConfigFile.SetShowManageLog(true);
 #endif
-        if (!Tools.ConfigFile.Init(Format(Tx("%%"), ConfigDirectory, Tx("\\Config.ini")))) {
-            lgcr(Err, Format(Tx("读取文件[%%]失败!"), ConfigDirectory, Tx("\\Config.ini")));
+        if (!Tools.ConfigFile.Init(Format(Tx("%"), Tools.ExeConfigFilePath))) {
+            lgcr(Err, Format(Tx("读取文件[%]失败!"), Tools.ExeConfigFilePath));
         }
         else {
-            lgc(Tip, Format(Tx("读取文件[%%]成功!"), ConfigDirectory, Tx("\\Config.ini")));
-            UpdateConfig();
+            lgc(Tip, Format(Tx("读取文件[%]成功!"), Tools.ExeConfigFilePath));
         }
     }
+
+    UpdateConfig();
 }
 
 void UpdateConfig()
@@ -144,7 +158,9 @@ void UpdateConfig()
     lgc(Tip, Format(Tx("\t修改的屏幕分辨率宽: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率宽")]));
     lgc(Tip, Format(Tx("\t修改的屏幕分辨率高: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率高")]));
     lgc(Tip, Format(Tx("\t设置_开机自启动: %"), Tools.BaseConfigItem[Tx("注册表开机自启动")]));
-    lgc(Tip, Format(Tx("\t设置_文件夹快捷键: %"), Tools.BaseConfigItem[Tx("文件夹快捷键")]));
+    //lgc(Tip, Format(Tx("\t设置_文件夹快捷键: %"), Tools.BaseConfigItem[Tx("文件夹快捷键")]));
+
+    SelfStarting(); //更新 开机自启动
 
     lgc(Format(Tx("  Tools.ConfigFile 所有配置: [%]"), ToStr(Tools.ConfigFile.GetConfigMap().size())));
 }

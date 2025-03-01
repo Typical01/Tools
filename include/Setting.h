@@ -25,7 +25,8 @@ public:
 	UINT WM_TASKBARCREATED;
 
 	Tstr ExeName = Tx("Tools"); //程序名
-	Tstr ExeCurrentPath = FileSystem::GetCurrentPath(); //当前程序的工作路径
+	Tstr ExeCurrentPath; //当前程序的路径
+	Tstr ExeConfigFilePath; //当前程序的配置文件路径
 	Tstr ExeWindowClassName = Tx("Typical_Tools"); //程序窗口类名
 	
 	Tstr ExeTrayName = Tx("典型一号的工具箱"); //程序托盘名
