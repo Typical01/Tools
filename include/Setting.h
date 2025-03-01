@@ -57,7 +57,7 @@ public:
 public:
 	Settings() {}
 };
-static Settings Tools;
+inline Settings Tools;
 
 //更新ConfigFile内容
 void UpdateConfig();

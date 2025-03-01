@@ -4,6 +4,7 @@
 #include "Setting.h"
 
 
+
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
 #ifdef _DEBUG
@@ -14,12 +15,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
     Log::SetShowConsole(false);
 #endif
     if (WindowsSystem::GetExeParentDirectoryPathName(Tools.ExeCurrentPath)) {
-        lgcr(War, Format(Tx("当前程序路径: [%]"), Tools.ExeCurrentPath));
-        lgcr(3);
+        lgc(War, Format(Tx("Tools.ExeCurrentPath: [%]"), Tools.ExeCurrentPath));
+        lgc(3);
     }
     else {
-        lgcr(Err, Format(Tx("当前程序路径: 获取失败!")));
-        lgcr(3);
+        lgc(Err, Format(Tx("当前程序路径: 获取失败!")));
+        lgc(3);
         return 0;
     }
 

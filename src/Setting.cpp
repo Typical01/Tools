@@ -39,8 +39,6 @@ int WindowsExeAutoRunItem()
     }
 
     LoadBaseConfig();
-
-    SelfStarting();
     LoadShellConfig();
 
     Tools.Icon = (LPTSTR)IDI_ICON256X;
@@ -72,8 +70,7 @@ void LoadBaseConfig(bool _bReLoad)
     }
 
     //先创建文件夹(否则后面的文件不能创建): \\Tools\\Config
-    //Tstr ConfigDirectory = Format(Tx("%\\Config"), Tools.ExeCurrentPath);
-    Tstr ConfigDirectory = Format(Tx("Config"));
+    Tstr ConfigDirectory = Format(Tx("%\\Config"), Tools.ExeCurrentPath).str();
     Tools.ExeConfigFilePath = Format(Tx("%%"), ConfigDirectory, Tx("\\Config.ini"));
     Tools.FileSystem.SetPath(ConfigDirectory);
     if (Tools.FileSystem.CreateDirectorys()) {
@@ -153,12 +150,12 @@ void UpdateConfig()
     Tools.ConfigFile_AllConfig = Tools.ConfigFile.GetConfigMap();
     Tools.BaseConfigItem = Tools.ConfigFile.GetConfigItem(Tx("基本设置"));
 
-    lgc(Tip, Format(Tx("\t原本屏幕分辨率宽: %"), Tools.BaseConfigItem[Tx("原本屏幕分辨率宽")]));
-    lgc(Tip, Format(Tx("\t原本屏幕分辨率高: %"), Tools.BaseConfigItem[Tx("原本屏幕分辨率高")]));
-    lgc(Tip, Format(Tx("\t修改的屏幕分辨率宽: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率宽")]));
-    lgc(Tip, Format(Tx("\t修改的屏幕分辨率高: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率高")]));
-    lgc(Tip, Format(Tx("\t设置_开机自启动: %"), Tools.BaseConfigItem[Tx("注册表开机自启动")]));
-    //lgc(Tip, Format(Tx("\t设置_文件夹快捷键: %"), Tools.BaseConfigItem[Tx("文件夹快捷键")]));
+    lgc(Tip, Format(Tx("  原本屏幕分辨率宽: %"), Tools.BaseConfigItem[Tx("原本屏幕分辨率宽")]));
+    lgc(Tip, Format(Tx("  原本屏幕分辨率高: %"), Tools.BaseConfigItem[Tx("原本屏幕分辨率高")]));
+    lgc(Tip, Format(Tx("  修改的屏幕分辨率宽: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率宽")]));
+    lgc(Tip, Format(Tx("  修改的屏幕分辨率高: %"), Tools.BaseConfigItem[Tx("修改的屏幕分辨率高")]));
+    lgc(Tip, Format(Tx("  设置_开机自启动: %"), Tools.BaseConfigItem[Tx("注册表开机自启动")]));
+    //lgc(Tip, Format(Tx("  设置_文件夹快捷键: %"), Tools.BaseConfigItem[Tx("文件夹快捷键")]));
 
     SelfStarting(); //更新 开机自启动
 
