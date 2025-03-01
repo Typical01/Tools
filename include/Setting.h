@@ -30,7 +30,7 @@ public:
 	Tstr ExeWindowClassName = Tx("Typical_Tools"); //程序窗口类名
 	
 	Tstr ExeTrayName = Tx("典型一号的工具箱"); //程序托盘名
-	Tstr ExeTitleName = Tx("典型一号的工具箱 v1.0_Plus"); //程序标题栏名
+	Tstr ExeTitleName = Tx("典型一号的工具箱 v1.0_Plus+"); //程序标题栏名
 
 	//窗口操作
 	WindowHost WindowHost;
