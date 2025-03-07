@@ -466,9 +466,7 @@ namespace Typical_Tool
 		{
 			if (ShowLog) {
 				if (Debug) { // Debug
-					if (!this->Release) {
-						Logs_ustr(_Text, _Lm(), _MessageKey);
-					}
+					Logs_ustr(_Text, _Lm(), _MessageKey);
 				}
 				else { // Release
 					if (this->Release) {
@@ -481,9 +479,7 @@ namespace Typical_Tool
 		{
 			if (ShowLog) {
 				if (Debug) { // Debug
-					if (!this->Release) {
-						Logs_ustr(_Text, _Lm(), _MessageKey);
-					}
+					Logs_ustr(_Text, _Lm(), _MessageKey);
 				}
 				else { // Release
 					if (this->Release) {
@@ -499,10 +495,8 @@ namespace Typical_Tool
 		{
 			if (ShowLog) {
 				if (Debug) { // Debug
-					if (!this->Release) {
-						for (auto i = 0; i < _LineNumber; i++) {
-							Logs_lgm();
-						}
+					for (auto i = 0; i < _LineNumber; i++) {
+						Logs_lgm();
 					}
 				}
 				else { // Release
@@ -587,19 +581,17 @@ namespace Typical_Tool
 		* Err: Error log level output
 		* !=Err: All(_Lm: Tip/War/tx) log level output
 		*/
-		void SetAllLogFileWrite(bool _LogFileWrite, const Tstr& _LogFileName, int _LogLevel = static_cast<int>(_Lm::Error))
+		void SetAllLogFileWrite(bool _LogFileWrite, const Tstr& _LogFileName, const Tstr& _LogFilePath, int _LogLevel = static_cast<int>(_Lm::Error))
 		{
 			IsLogFileWrite = _LogFileWrite;
 			IsLogFileWriteThreadStop = false;
 
 			if (IsLogFileWrite) {
-				//Terr << "Log 日志WriteConfigFile: 开始\n";
-
-				//获取 当前路径/Log/Log文件名.txt 
-				//创建文件夹 ./Log  .
+				//获取 当前路径/Log/文件名_Log.txt 
+				//创建文件夹 Log
 				Tstr Log_FilePath = _LogFileName + Tx("_Log.txt");
 				if (!SingleLogFile) {
-					Tstr Log_FolderName = (Tstr)Tx(".") + PATH_SLASH + Tx("Log");
+					Tstr Log_FolderName = Tx("Log");
 					if (std::filesystem::exists(Log_FolderName)) { //目录存在
 						if (std::filesystem::is_directory(Log_FolderName)) { // 是目录
 							//Log文件名: 格式化日期时间(年-月-日_时-分-秒) + .txt
@@ -614,7 +606,7 @@ namespace Typical_Tool
 						std::filesystem::create_directory(Log_FolderName); //创建目录
 						//Log文件名: 格式化日期时间(年-月-日_时-分-秒) + .txt
 						Tstr Log_FileName = Log::GetFormatTime(Tx("%Y-%m-%d_%H-%M-%S_"), Tx(""), Tx(""));
-						// ./Log/时间.txt  ||  ./时间.txt
+						//Log/时间.txt  ||  ./时间.txt
 						Log_FilePath = Format(Tx("%%%%"), Log_FolderName, PATH_SLASH, Log_FileName, Log_FilePath);
 					}
 				}
@@ -623,7 +615,10 @@ namespace Typical_Tool
 				if (Debug) {
 					Log_Out(ANSIESC_GREEN, Terr, Format(Tx("%Log: 日志输出文件名[%]\n"), Log_Tips, Log_FilePath), ANSIESC_RESET, -1, true);
 				}
-				LogFileStream_Out = std::make_shared<Tofstream>(Log_FilePath, ios::out);
+				if (_LogFilePath != Tx("")) {
+					Log_FilePath = Format(Tx("%\\%"), _LogFilePath, Log_FilePath);
+				}
+				LogFileStream_Out = std::make_shared<Tofstream>(Format(Tx("%"), Log_FilePath), ios::out);
 				if (!LogFileStream_Out->good()) {
 					if (Debug) {
 						Log_Out(ANSIESC_RED, Terr, Format(Tx("%Log: [%]打开文件失败!\n"), Log_Error, Log_FilePath), ANSIESC_RESET, -1, true);

@@ -57,7 +57,7 @@ namespace Typical_Tool {
 
 
 		// WindowFont
-		class  WindowFont {
+		class WindowFont {
 		private:
 			static HFONT Font;
 
@@ -80,6 +80,8 @@ namespace Typical_Tool {
 			WindowFont(HFONT hFont) {
 				Font = hFont;
 			}
+
+			HFONT GetFont() { return Font; }
 
 			void SetFont(HFONT hFont);
 
@@ -189,6 +191,9 @@ namespace Typical_Tool {
 				this->Window.insert(std::make_pair(windowName, window));
 				return true;
 			}
+
+			WindowFont GetWindowFont() { return this->WinFont; }
+
 			void SetFont(HFONT hFont);
 		public:
 
