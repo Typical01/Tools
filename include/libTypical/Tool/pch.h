@@ -27,8 +27,10 @@
 #include <atomic>
 #include <thread>
 #include <chrono>
-
+#include <functional>
+#include <future>
 #include <type_traits>
+
 #include <cassert>
 
 #include <iomanip>
@@ -46,12 +48,24 @@
 
 
 #ifdef _WINDOWS
+#define WINVER 0x0A00 // Windows 10
+#define _WIN32_WINNT 0x0A00 // Windows 10
+
+
+
+
 #include <io.h>
 #include <comdef.h>
 #include <commctrl.h>
 #include <tchar.h>
 #include <Windows.h>
 #include <TlHelp32.h>
+#include <ShellScalingAPI.h>
+
+#ifdef WIN32APP
+#pragma comment(lib, "Shcore.lib")
+#include <Shcore.h>
+#endif
 #endif
 
 

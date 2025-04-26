@@ -25,19 +25,19 @@ public:
 	UINT WM_TASKBARCREATED;
 
 #ifdef _DEBUG
-	Tstr ExeName = Tx("Tools_DEBUG"); //程序名
+	Tstr ExeName = TEXT("Tools_DEBUG"); //程序名
 #else
-	Tstr ExeName = Tx("Tools"); //程序名
+	Tstr ExeName = TEXT("Tools"); //程序名
 #endif
 	Tstr ExeCurrentPath; //当前程序的路径
 	Tstr ExeConfigFilePath; //当前程序的配置文件路径
-	Tstr ToolsWindowClassName = Tx("Typical_Tools"); //程序窗口类名
+	Tstr ToolsWindowClassName = TEXT("Typical_Tools"); //程序窗口类名
 
 	int SettingWindowWidth = 540;
 	int SettingWindowHeight = 800;
 	
-	Tstr ExeTrayName = Tx("典型一号的工具箱"); //程序托盘名
-	Tstr ExeTitleName = Tx("典型一号的工具箱 v1.1"); //程序标题栏名
+	Tstr ExeTrayName = TEXT("典型一号的工具箱"); //程序托盘名
+	Tstr ExeTitleName = TEXT("典型一号的工具箱 v1.2"); //程序标题栏名
 
 	//窗口操作
 	Win::WindowHost WindowHost;
