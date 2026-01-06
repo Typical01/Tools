@@ -1,0 +1,102 @@
+[gd_scene load_steps=4 format=3 uid="uid://bx4hybkknl8qq"]
+
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="1_3cyvc"]
+[ext_resource type="Script" uid="uid://0id4o32fbcaa" path="res://script/ui/edit_dialog.gd" id="2_ayrpg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ayrpg"]
+bg_color = Color(0.99607843, 0.99607843, 0.99607843, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.827451, 0.827451, 0.827451, 1)
+expand_margin_left = 6.0
+expand_margin_top = 36.0
+expand_margin_right = 6.0
+expand_margin_bottom = 6.0
+
+[node name="EditDialog" type="Window"]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Title"
+initial_position = 2
+size = Vector2i(300, 120)
+theme = ExtResource("1_3cyvc")
+script = ExtResource("2_ayrpg")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ayrpg")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Space2" type="Control" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Space3" type="Control" parent="Panel/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="LineEdit" type="LineEdit" parent="Panel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_3cyvc")
+clear_button_enabled = true
+draw_control_chars = true
+
+[node name="Space2" type="Control" parent="Panel/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Space3" type="Control" parent="Panel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Space3" type="Control" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonAccept" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "确定"
+
+[node name="Space5" type="Control" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="ButtonCancel" type="Button" parent="Panel/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "取消"
+
+[node name="Space4" type="Control" parent="Panel/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="focus_entered" from="." to="." method="_on_focus_entered"]
+[connection signal="editing_toggled" from="Panel/VBoxContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_editing_toggled"]
+[connection signal="text_changed" from="Panel/VBoxContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]
+[connection signal="button_up" from="Panel/VBoxContainer/HBoxContainer2/ButtonAccept" to="." method="_on_button_accept_button_up"]
+[connection signal="button_up" from="Panel/VBoxContainer/HBoxContainer2/ButtonCancel" to="." method="_on_button_cancel_button_up"]

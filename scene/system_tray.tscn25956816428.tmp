@@ -1,0 +1,160 @@
+[gd_scene load_steps=19 format=3 uid="uid://dqjpsw4etbvkf"]
+
+[ext_resource type="Texture2D" uid="uid://dgskfnhbtw2ru" path="res://trayicon.png" id="1_nl4o3"]
+[ext_resource type="Script" uid="uid://duoiqfnbd2uro" path="res://script/system_tray.gd" id="2_ulrfk"]
+[ext_resource type="PackedScene" uid="uid://cla4fvd6xduww" path="res://scene/tray_menu.tscn" id="3_nl4o3"]
+[ext_resource type="PackedScene" uid="uid://567yp2t1ywd8" path="res://scene/ui/tab_bar_vertical.tscn" id="4_4uq6m"]
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="5_86tvx"]
+[ext_resource type="PackedScene" uid="uid://ctg44udo3c8xj" path="res://scene/ui/tab_bar_rect.tscn" id="6_hchcy"]
+[ext_resource type="PackedScene" uid="uid://dm4h8r0se8ows" path="res://scene/ui/tab_item.tscn" id="7_5pwbe"]
+[ext_resource type="Script" uid="uid://2nc4oygtnvca" path="res://resource/tab_item.gd" id="7_8e5wu"]
+[ext_resource type="PackedScene" uid="uid://c2p8cv27l2r53" path="res://scene/ui/check_button_switch.tscn" id="8_5pwbe"]
+[ext_resource type="PackedScene" uid="uid://dgk3avgwifsn0" path="res://scene/ui/option_button.tscn" id="10_3gx04"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ok4lx"]
+bg_color = Color(0.9529412, 0.9529412, 0.9529412, 1)
+
+[sub_resource type="GDScript" id="GDScript_86tvx"]
+script/source = "extends Panel
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	%ListItem.select(0)
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[sub_resource type="PackedScene" id="PackedScene_5kivw"]
+_bundled = {
+"conn_count": 0,
+"conns": PackedInt32Array(),
+"editable_instances": [],
+"names": PackedStringArray("Panel", "Panel", "custom_minimum_size", "offset_right", "offset_bottom", "theme_override_styles/panel", "script", "ListItem", "unique_name_in_owner", "layout_mode", "item_0/text"),
+"node_count": 2,
+"node_paths": [NodePath(".")],
+"nodes": PackedInt32Array(-1, -1, 1, 0, -1, 5, 2, 0, 3, 1, 4, 2, 5, 3, 6, 4, 0, 1073741824, 0, 2147483647, 7, 5, 3, 8, 6, 9, 7, 10, 8, 0),
+"variants": [Vector2(200, 200), 800.0, 600.0, SubResource("StyleBoxFlat_ok4lx"), SubResource("GDScript_86tvx"), ExtResource("4_4uq6m"), true, 0, "ShellExecute"],
+"version": 3
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hchcy"]
+bg_color = Color(0.9529412, 0.9529412, 0.9529412, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5pwbe"]
+
+[sub_resource type="Resource" id="Resource_7eey1"]
+script = ExtResource("7_8e5wu")
+scene_tamplate = ExtResource("7_5pwbe")
+item_name = "开机自启动"
+item_info = "TypicalTools 将在开机后自动启动在后台"
+control_interface_scene = Array[PackedScene]([ExtResource("8_5pwbe")])
+metadata/_custom_type_script = "uid://2nc4oygtnvca"
+
+[sub_resource type="Resource" id="Resource_8cpsd"]
+script = ExtResource("7_8e5wu")
+scene_tamplate = ExtResource("7_5pwbe")
+item_name = "修改分辨率"
+item_info = "修改托盘菜单选项[修改分辨率]为指定比例"
+control_interface_scene = Array[PackedScene]([ExtResource("10_3gx04")])
+metadata/_custom_type_script = "uid://2nc4oygtnvca"
+
+[sub_resource type="Resource" id="Resource_vldov"]
+script = ExtResource("7_8e5wu")
+scene_tamplate = ExtResource("7_5pwbe")
+item_name = "还原分辨率"
+item_info = "修改托盘菜单选项[还原分辨率]为指定比例"
+control_interface_scene = Array[PackedScene]([ExtResource("10_3gx04")])
+metadata/_custom_type_script = "uid://2nc4oygtnvca"
+
+[node name="StatusIndicator" type="StatusIndicator"]
+tooltip = "TypicalTools"
+icon = ExtResource("1_nl4o3")
+menu = NodePath("TrayMenu")
+script = ExtResource("2_ulrfk")
+
+[node name="TrayMenu" parent="." node_paths=PackedStringArray("tray_icon") instance=ExtResource("3_nl4o3")]
+unique_name_in_owner = true
+visible = false
+unfocusable = false
+item_count = 0
+setting_ui = SubResource("PackedScene_5kivw")
+tray_icon = NodePath("../TrayIcon")
+
+[node name="TrayIcon" type="TrayIcon" parent="."]
+unique_name_in_owner = true
+
+[node name="SettingsWindow" type="Panel" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hchcy")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsWindow/HBoxContainer"]
+layout_mode = 2
+
+[node name="Space3" type="Control" parent="SettingsWindow/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+
+[node name="TabItem" parent="SettingsWindow/HBoxContainer/HBoxContainer" instance=ExtResource("4_4uq6m")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_5pwbe")
+
+[node name="TabItemPage" type="Panel" parent="SettingsWindow/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("5_86tvx")
+
+[node name="ShellExecutePage" type="Panel" parent="SettingsWindow/HBoxContainer/TabItemPage"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_hchcy")
+
+[node name="SettingPage" type="Panel" parent="SettingsWindow/HBoxContainer/TabItemPage"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_hchcy")
+
+[node name="General" parent="SettingsWindow/HBoxContainer/TabItemPage/SettingPage" instance=ExtResource("6_hchcy")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 180)
+layout_mode = 0
+offset_right = 400.0
+offset_bottom = 230.0
+title = "设置"
+tab_item_list = Array[ExtResource("7_8e5wu")]([SubResource("Resource_7eey1"), SubResource("Resource_8cpsd"), SubResource("Resource_vldov")])
+
+[connection signal="mouse_entered" from="TrayMenu" to="." method="_on_menu_mouse_entered"]
+[connection signal="set_window_from_taskbar" from="TrayMenu" to="." method="_on_tray_menu_set_window_from_taskbar"]
+[connection signal="item_selected" from="SettingsWindow/HBoxContainer/HBoxContainer/TabItem" to="." method="_on_tab_item_item_selected"]

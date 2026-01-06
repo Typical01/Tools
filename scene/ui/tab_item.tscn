@@ -1,0 +1,145 @@
+[gd_scene load_steps=9 format=3 uid="uid://dm4h8r0se8ows"]
+
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="1_x5slx"]
+[ext_resource type="Texture2D" uid="uid://dbx66sovxd1" path="res://icon.svg" id="2_4u7wp"]
+[ext_resource type="Script" uid="uid://c3gpmcdt230e5" path="res://script/ui/tab_item.gd" id="2_ieqt4"]
+[ext_resource type="FoldableGroup" uid="uid://dye2fj3ogulen" path="res://resource/tab_foldable_group.tres" id="4_ieqt4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ieqt4"]
+bg_color = Color(0.9843137, 0.9843137, 0.9843137, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8980392, 0.8980392, 0.8980392, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j7fkw"]
+bg_color = Color(0.9843137, 0.9843137, 0.9843137, 1)
+
+[sub_resource type="SystemFont" id="SystemFont_ieqt4"]
+font_names = PackedStringArray("Microsoft YaHei UI", "Sans-Serif")
+font_weight = 300
+hinting = 0
+subpixel_positioning = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_htr6a"]
+bg_color = Color(0.9843137, 0.9843137, 0.9843137, 1)
+
+[node name="TabItem" type="Panel"]
+custom_minimum_size = Vector2(490, 100)
+offset_top = 1.0
+offset_right = 490.0
+offset_bottom = 81.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_x5slx")
+theme_override_styles/panel = SubResource("StyleBoxFlat_ieqt4")
+script = ExtResource("2_ieqt4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Space" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+metadata/_tab_index = 0
+
+[node name="Space" type="Control" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="VBoxContainerIcon" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Icon" type="TextureRect" parent="VBoxContainer/HBoxContainer/VBoxContainerIcon"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_4u7wp")
+
+[node name="Space2" type="Control" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="VBoxContainerText" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TabItemName" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainerText"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("1_x5slx")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/normal = SubResource("StyleBoxFlat_j7fkw")
+text = "Name"
+
+[node name="TabItemInfo" type="Label" parent="VBoxContainer/HBoxContainer/VBoxContainerText"]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("1_x5slx")
+theme_override_fonts/font = SubResource("SystemFont_ieqt4")
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_htr6a")
+text = "SimpleInfo"
+
+[node name="Space3" type="Control" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="ControlInterface" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 6
+
+[node name="Space4" type="Control" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="VBoxContainerOptionButton" type="VBoxContainer" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer/VBoxContainerOptionButton"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme = ExtResource("1_x5slx")
+flat = true
+
+[node name="Space5" type="Control" parent="VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="FoldableContainer" type="FoldableContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+size_flags_vertical = 0
+theme = ExtResource("1_x5slx")
+foldable_group = ExtResource("4_ieqt4")
+
+[node name="Space2" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[connection signal="folding_changed" from="VBoxContainer/FoldableContainer" to="." method="_on_option_panel_folding_changed"]

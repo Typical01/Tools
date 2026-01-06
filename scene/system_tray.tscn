@@ -1,0 +1,594 @@
+[gd_scene load_steps=27 format=3 uid="uid://dqjpsw4etbvkf"]
+
+[ext_resource type="Texture2D" uid="uid://dgskfnhbtw2ru" path="res://trayicon.png" id="1_nl4o3"]
+[ext_resource type="Script" uid="uid://duoiqfnbd2uro" path="res://script/system_tray.gd" id="2_ulrfk"]
+[ext_resource type="PackedScene" uid="uid://cla4fvd6xduww" path="res://scene/tray_menu.tscn" id="3_nl4o3"]
+[ext_resource type="PackedScene" uid="uid://567yp2t1ywd8" path="res://scene/ui/tab_bar_vertical.tscn" id="4_4uq6m"]
+[ext_resource type="PackedScene" uid="uid://xk8cn281i66g" path="res://scene/ui/popup_tips.tscn" id="4_32amb"]
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="5_86tvx"]
+[ext_resource type="PackedScene" uid="uid://b6jmbho0pc6qc" path="res://scene/ui/tab_list.tscn" id="6_4utdk"]
+[ext_resource type="PackedScene" uid="uid://ctg44udo3c8xj" path="res://scene/ui/tab_bar_rect.tscn" id="6_hchcy"]
+[ext_resource type="Texture2D" uid="uid://fsa0sblrtj4b" path="res://art/ui/Flat_Settings.png" id="6_jejqm"]
+[ext_resource type="Texture2D" uid="uid://tms48p7744xd" path="res://art/ui/Flat_ShellExecute.png" id="6_rvroj"]
+[ext_resource type="PackedScene" uid="uid://uqil5vgtsygi" path="res://scene/ui/tab_list_item.tscn" id="7_4utdk"]
+[ext_resource type="PackedScene" uid="uid://dm4h8r0se8ows" path="res://scene/ui/tab_item.tscn" id="7_5pwbe"]
+[ext_resource type="Script" uid="uid://2nc4oygtnvca" path="res://resource/tab_item.gd" id="7_8e5wu"]
+[ext_resource type="PackedScene" uid="uid://c2p8cv27l2r53" path="res://scene/ui/check_button_switch.tscn" id="8_5pwbe"]
+[ext_resource type="PackedScene" uid="uid://dgk3avgwifsn0" path="res://scene/ui/option_button.tscn" id="10_3gx04"]
+[ext_resource type="Texture2D" uid="uid://6y7h414b1aiy" path="res://art/ui/Flat_Folder_Border.png" id="10_rvroj"]
+[ext_resource type="PackedScene" uid="uid://bx4hybkknl8qq" path="res://scene/ui/edit_dialog.tscn" id="10_vldov"]
+[ext_resource type="Texture2D" uid="uid://2wvhxa033end" path="res://art/ui/Flat_File_Border.png" id="13_8xv83"]
+[ext_resource type="Texture2D" uid="uid://cdx4igpfjni4w" path="res://art/ui/Flat_RunAsAdministrator_Border.png" id="14_8cpsd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hchcy"]
+bg_color = Color(0.9529412, 0.9529412, 0.9529412, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5pwbe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0alx"]
+bg_color = Color(0.9843137, 0.9843137, 0.9843137, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w35qg"]
+bg_color = Color(0.9843137, 0.9843137, 0.9843137, 1)
+
+[sub_resource type="Resource" id="Resource_7eey1"]
+script = ExtResource("7_8e5wu")
+scene_template = ExtResource("7_5pwbe")
+item_name = "开机自启动"
+item_info = "TypicalTools 将在开机后自动启动在后台"
+control_interface_scene = Array[PackedScene]([ExtResource("8_5pwbe")])
+metadata/_custom_type_script = "uid://2nc4oygtnvca"
+
+[sub_resource type="Resource" id="Resource_8cpsd"]
+script = ExtResource("7_8e5wu")
+scene_template = ExtResource("7_5pwbe")
+item_name = "修改分辨率"
+item_info = "修改托盘菜单选项[修改分辨率]为指定比例"
+control_interface_scene = Array[PackedScene]([ExtResource("10_3gx04")])
+metadata/_custom_type_script = "uid://2nc4oygtnvca"
+
+[sub_resource type="Resource" id="Resource_vldov"]
+script = ExtResource("7_8e5wu")
+scene_template = ExtResource("7_5pwbe")
+item_name = "还原分辨率"
+item_info = "修改托盘菜单选项[还原分辨率]为指定比例"
+control_interface_scene = Array[PackedScene]([ExtResource("10_3gx04")])
+metadata/_custom_type_script = "uid://2nc4oygtnvca"
+
+[node name="StatusIndicator" type="StatusIndicator"]
+tooltip = "TypicalTools"
+icon = ExtResource("1_nl4o3")
+menu = NodePath("TrayMenu")
+script = ExtResource("2_ulrfk")
+
+[node name="TrayMenu" parent="." node_paths=PackedStringArray("tray_icon") instance=ExtResource("3_nl4o3")]
+unique_name_in_owner = true
+visible = false
+unfocusable = false
+item_count = 0
+tray_icon = NodePath("../TrayIcon")
+
+[node name="TrayIcon" type="TrayIcon" parent="."]
+unique_name_in_owner = true
+
+[node name="EditDialog" parent="." instance=ExtResource("10_vldov")]
+title = "Null"
+size = Vector2i(600, 120)
+visible = false
+
+[node name="FileDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "选择文件"
+initial_position = 2
+size = Vector2i(640, 420)
+ok_button_text = "确定"
+dialog_hide_on_ok = true
+cancel_button_text = "取消"
+mode_overrides_title = false
+file_mode = 3
+access = 2
+show_hidden_files = true
+use_native_dialog = true
+
+[node name="SettingsWindow" type="Panel" parent="."]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hchcy")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsWindow"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsWindow/HBoxContainer"]
+layout_mode = 2
+
+[node name="Space3" type="Control" parent="SettingsWindow/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsWindow/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Space3" type="Control" parent="SettingsWindow/HBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="TabItem" parent="SettingsWindow/HBoxContainer/HBoxContainer/VBoxContainer" instance=ExtResource("4_4uq6m")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/focus = SubResource("StyleBoxEmpty_5pwbe")
+item_0/icon = ExtResource("6_rvroj")
+item_1/icon = ExtResource("6_jejqm")
+
+[node name="TabItemPage" type="Panel" parent="SettingsWindow/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("5_86tvx")
+
+[node name="ShellExecutePage" type="Panel" parent="SettingsWindow/HBoxContainer/TabItemPage"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_hchcy")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Space" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Space2" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(6, 0)
+layout_mode = 2
+
+[node name="StartItem" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer" instance=ExtResource("6_4utdk")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 240)
+layout_mode = 2
+size_flags_horizontal = 3
+title_name = "启动项"
+title_info = "程序启动时运行"
+scene_template = ExtResource("7_4utdk")
+
+[node name="MenuItem" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer" instance=ExtResource("6_4utdk")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 240)
+layout_mode = 2
+size_flags_horizontal = 3
+title_name = "菜单项"
+title_info = "添加到托盘菜单作为选项"
+scene_template = ExtResource("7_4utdk")
+
+[node name="Space3" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(6, 0)
+layout_mode = 2
+
+[node name="Space2" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer"]
+layout_mode = 2
+
+[node name="ItemEditPanel" type="HBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 380)
+layout_mode = 2
+
+[node name="Space2" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel"]
+custom_minimum_size = Vector2(6, 0)
+layout_mode = 2
+
+[node name="ItemEdit" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel" instance=ExtResource("6_4utdk")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 310)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+title_info = "ShellExecute编辑"
+scene_template = ExtResource("7_4utdk")
+
+[node name="VBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground" index="0"]
+theme_override_constants/separation = 0
+
+[node name="TabName" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer2/VBoxContainer" index="0"]
+theme_override_font_sizes/font_size = 24
+text = "ShellExecute配置"
+
+[node name="TabInfo" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer2/VBoxContainer" index="1"]
+visible = false
+
+[node name="Space2" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer2" index="2"]
+custom_minimum_size = Vector2(240, 0)
+
+[node name="LableArg" type="Label" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer2" index="3"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_e0alx")
+text = "参数"
+
+[node name="Space5" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer2" index="4"]
+custom_minimum_size = Vector2(18, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ButtonAdd" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer2" index="5"]
+visible = false
+
+[node name="ButtonDel" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer2" index="7"]
+visible = false
+
+[node name="Space6" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer" index="2"]
+custom_minimum_size = Vector2(0, 6)
+
+[node name="ScrollContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer" index="1"]
+visible = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer" index="3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Space4" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Space4" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_w35qg")
+text = "操作名"
+
+[node name="Space5" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+
+[node name="OperateName" type="LineEdit" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+placeholder_text = "例: Test"
+
+[node name="Space6" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
+[node name="Space6" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Space5" type="HSeparator" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("5_86tvx")
+
+[node name="Space9" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Space4" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_w35qg")
+text = "文件路径"
+
+[node name="Space5" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="File" type="LineEdit" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+placeholder_text = "例: cmd.exe 或 C:/Test"
+
+[node name="Space6" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
+[node name="SelectFile" type="Button" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+icon = ExtResource("10_rvroj")
+expand_icon = true
+
+[node name="Space7" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
+[node name="Space10" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Space11" type="HSeparator" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("5_86tvx")
+
+[node name="Space12" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Space4" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_w35qg")
+text = "模式"
+
+[node name="Space5" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShellOperate" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2" instance=ExtResource("10_3gx04")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+selected = 0
+item_count = 3
+popup/item_0/text = "打开文件"
+popup/item_0/icon = ExtResource("13_8xv83")
+popup/item_0/id = 0
+popup/item_1/text = "打开文件夹"
+popup/item_1/icon = ExtResource("10_rvroj")
+popup/item_1/id = 1
+popup/item_2/text = "管理员运行"
+popup/item_2/icon = ExtResource("14_8cpsd")
+popup/item_2/id = 2
+
+[node name="Space6" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
+[node name="Space7" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Space8" type="HSeparator" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("5_86tvx")
+
+[node name="Space16" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Space4" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_w35qg")
+text = "显示窗口"
+
+[node name="Space5" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="WindowShow" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4" instance=ExtResource("8_5pwbe")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+show_text = false
+
+[node name="Space6" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
+[node name="Space13" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="VSeparator" type="VSeparator" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer" index="4"]
+layout_mode = 2
+theme = ExtResource("5_86tvx")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer" index="5"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Space4" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="Space4" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_w35qg")
+text = "程序开关"
+
+[node name="Space5" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+
+[node name="ProgramSwitch" type="LineEdit" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("5_86tvx")
+theme_override_font_sizes/font_size = 20
+placeholder_text = "例: /c /k /q /u /a /d /s"
+
+[node name="Space6" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer"]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+
+[node name="Space6" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Space8" type="HSeparator" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("5_86tvx")
+
+[node name="Arg" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("6_4utdk")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(420, 160)
+layout_mode = 2
+size_flags_horizontal = 1
+scene_template = ExtResource("7_4utdk")
+
+[node name="TabName" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg/TabBarBackground/VBoxContainer/HBoxContainer2/VBoxContainer" index="0"]
+theme_override_font_sizes/font_size = 22
+text = "参数"
+
+[node name="TabInfo" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg/TabBarBackground/VBoxContainer/HBoxContainer2/VBoxContainer" index="1"]
+visible = false
+
+[node name="Space5" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer" index="6"]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+
+[node name="Space3" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer" index="5"]
+custom_minimum_size = Vector2(0, 1)
+
+[node name="Space2" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="Space3" type="Control" parent="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel"]
+custom_minimum_size = Vector2(6, 0)
+layout_mode = 2
+
+[node name="SettingPage" type="Panel" parent="SettingsWindow/HBoxContainer/TabItemPage"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_hchcy")
+
+[node name="General" parent="SettingsWindow/HBoxContainer/TabItemPage/SettingPage" instance=ExtResource("6_hchcy")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 180)
+layout_mode = 0
+offset_right = 400.0
+offset_bottom = 230.0
+title = "设置"
+tab_item_list = Array[ExtResource("7_8e5wu")]([SubResource("Resource_7eey1"), SubResource("Resource_8cpsd"), SubResource("Resource_vldov")])
+
+[node name="PopupTips" parent="." instance=ExtResource("4_32amb")]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(200, 60)
+item_name = "保存成功"
+
+[connection signal="mouse_entered" from="TrayMenu" to="." method="_on_menu_mouse_entered"]
+[connection signal="set_window_from_taskbar" from="TrayMenu" to="." method="_on_tray_menu_set_window_from_taskbar"]
+[connection signal="edit_accept" from="EditDialog" to="." method="_on_edit_dialog_edit_accept"]
+[connection signal="canceled" from="FileDialog" to="." method="_on_file_dialog_canceled"]
+[connection signal="confirmed" from="FileDialog" to="." method="_on_file_dialog_confirmed"]
+[connection signal="dir_selected" from="FileDialog" to="." method="_on_file_dialog_dir_selected"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="item_selected" from="SettingsWindow/HBoxContainer/HBoxContainer/VBoxContainer/TabItem" to="." method="_on_tab_item_item_selected"]
+[connection signal="init_list_item" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/StartItem" to="." method="_on_start_init_list_item"]
+[connection signal="list_item_add" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/StartItem" to="." method="_on_list_item_add"]
+[connection signal="list_item_check" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/StartItem" to="." method="_on_item_list_item_check"]
+[connection signal="list_item_del" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/StartItem" to="." method="_on_list_item_del"]
+[connection signal="list_item_move_down" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/StartItem" to="." method="_on_item_list_item_move"]
+[connection signal="list_item_move_up" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/StartItem" to="." method="_on_item_list_item_move"]
+[connection signal="list_item_select" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/StartItem" to="." method="_on_start_list_item_select"]
+[connection signal="init_list_item" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/MenuItem" to="." method="_on_menu_item_init_list_item"]
+[connection signal="list_item_add" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/MenuItem" to="." method="_on_list_item_add"]
+[connection signal="list_item_check" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/MenuItem" to="." method="_on_item_list_item_check"]
+[connection signal="list_item_del" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/MenuItem" to="." method="_on_list_item_del"]
+[connection signal="list_item_move_down" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/MenuItem" to="." method="_on_item_list_item_move"]
+[connection signal="list_item_move_up" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/MenuItem" to="." method="_on_item_list_item_move"]
+[connection signal="list_item_select" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/HBoxContainer/MenuItem" to="." method="_on_menu_list_item_select"]
+[connection signal="editing_toggled" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/OperateName" to="." method="_on_operate_name_editing_toggled"]
+[connection signal="editing_toggled" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/File" to="." method="_on_file_editing_toggled"]
+[connection signal="button_up" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/SelectFile" to="." method="_on_select_file_button_up"]
+[connection signal="item_selected_index" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ShellOperate" to="." method="_on_shell_operate_item_selected_index"]
+[connection signal="toggled_switch" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4/WindowShow" to="." method="_on_window_show_toggled_switch"]
+[connection signal="editing_toggled" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/HBoxContainer/ProgramSwitch" to="." method="_on_program_switch_editing_toggled"]
+[connection signal="list_item_add" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_arg_list_item_add"]
+[connection signal="list_item_change" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_arg_list_item_change"]
+[connection signal="list_item_check" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_arg_list_item_check"]
+[connection signal="list_item_del" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_arg_list_item_del"]
+[connection signal="list_item_edit" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_arg_list_item_edit"]
+[connection signal="list_item_move_down" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_item_list_item_move"]
+[connection signal="list_item_move_up" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_item_list_item_move"]
+[connection signal="list_item_select" from="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg" to="." method="_on_arg_list_item_select"]
+
+[editable path="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit"]
+[editable path="SettingsWindow/HBoxContainer/TabItemPage/ShellExecutePage/VBoxContainer/ItemEditPanel/ItemEdit/TabBarBackground/VBoxContainer/HBoxContainer/VBoxContainer2/Arg"]

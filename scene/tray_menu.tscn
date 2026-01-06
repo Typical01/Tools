@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://cla4fvd6xduww"]
+
+[ext_resource type="Script" uid="uid://db2fww8prx75j" path="res://script/tray_menu.gd" id="1_aqiri"]
+
+[node name="Menu" type="PopupMenu"]
+auto_translate_mode = 1
+oversampling_override = 1.0
+visible = true
+unfocusable = true
+item_count = 4
+item_0/text = "设置"
+item_0/id = 1
+item_1/text = "关于"
+item_1/id = 1
+item_2/id = 0
+item_2/separator = true
+item_3/text = "退出"
+item_3/id = 0
+script = ExtResource("1_aqiri")
+
+[connection signal="id_pressed" from="." to="." method="_on_id_pressed"]
+[connection signal="index_pressed" from="." to="." method="_on_index_pressed"]

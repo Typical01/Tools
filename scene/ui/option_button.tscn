@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://dgk3avgwifsn0"]
+
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="1_2j6uk"]
+[ext_resource type="Script" uid="uid://cmpp0u61nrfd0" path="res://script/ui/option_button.gd" id="2_25lyv"]
+
+[node name="OptionButton" type="OptionButton"]
+offset_right = 33.0
+offset_bottom = 36.0
+theme = ExtResource("1_2j6uk")
+theme_override_font_sizes/font_size = 22
+theme_override_constants/modulate_arrow = 1
+action_mode = 1
+keep_pressed_outside = true
+script = ExtResource("2_25lyv")
+
+[connection signal="item_selected" from="." to="." method="_on_item_selected"]

@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3 uid="uid://uqil5vgtsygi"]
+
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="1_vjxyp"]
+[ext_resource type="Script" uid="uid://cljoyrhlx4veh" path="res://script/ui/tab_list_item.gd" id="2_vjxyp"]
+[ext_resource type="PackedScene" uid="uid://c2p8cv27l2r53" path="res://scene/ui/check_button_switch.tscn" id="4_vjxyp"]
+
+[node name="TabItem" type="HBoxContainer"]
+custom_minimum_size = Vector2(418, 60)
+offset_top = 1.0
+offset_right = 418.0
+offset_bottom = 61.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource("1_vjxyp")
+script = ExtResource("2_vjxyp")
+item_name = null
+
+[node name="Space" type="Control" parent="."]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="ItemName" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ItemName"]
+layout_mode = 0
+offset_left = 6.0
+offset_right = 416.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+metadata/_tab_index = 0
+
+[node name="Space" type="Control" parent="ItemName/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="VBoxContainerIcon" type="VBoxContainer" parent="ItemName/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Icon" type="TextureRect" parent="ItemName/HBoxContainer/VBoxContainerIcon"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Space2" type="Control" parent="ItemName/HBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="CheckButton" parent="ItemName/HBoxContainer" instance=ExtResource("4_vjxyp")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+show_text = false
+
+[node name="Space5" type="Control" parent="ItemName/HBoxContainer"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2

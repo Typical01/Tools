@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://c2p8cv27l2r53"]
+
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="1_c77v1"]
+[ext_resource type="Script" uid="uid://c6b7nwx3pp754" path="res://script/ui/check_button_switch.gd" id="2_6ruht"]
+
+[node name="CheckButton" type="CheckButton"]
+theme = ExtResource("1_c77v1")
+theme_override_constants/h_separation = 16
+button_pressed = true
+text = "关"
+flat = true
+script = ExtResource("2_6ruht")
+
+[connection signal="toggled" from="." to="." method="_on_toggled"]

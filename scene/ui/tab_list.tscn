@@ -1,0 +1,144 @@
+[gd_scene load_steps=5 format=3 uid="uid://b6jmbho0pc6qc"]
+
+[ext_resource type="Theme" uid="uid://b84tvhenxwonh" path="res://resource/flat_ligth_theme.tres" id="1_frrgb"]
+[ext_resource type="Script" uid="uid://c1rna6d1iw0i5" path="res://script/ui/tab_list.gd" id="2_frrgb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_61x7x"]
+bg_color = Color(0.9843137, 0.9843137, 0.9843137, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8980392, 0.8980392, 0.8980392, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0alx"]
+bg_color = Color(0.9843137, 0.9843137, 0.9843137, 1)
+
+[node name="TabList" type="VBoxContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(420, 320)
+offset_right = 400.0
+offset_bottom = 300.0
+size_flags_horizontal = 6
+size_flags_vertical = 3
+theme = ExtResource("1_frrgb")
+script = ExtResource("2_frrgb")
+
+[node name="TabBarBackground" type="Panel" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme = ExtResource("1_frrgb")
+theme_override_styles/panel = SubResource("StyleBoxFlat_61x7x")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabBarBackground"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Space5" type="Control" parent="TabBarBackground/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="TabBarBackground/VBoxContainer"]
+layout_mode = 2
+
+[node name="Space" type="Control" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(18, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+
+[node name="TabName" type="Label" parent="TabBarBackground/VBoxContainer/HBoxContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("1_frrgb")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_e0alx")
+text = "TabItem"
+
+[node name="TabInfo" type="Label" parent="TabBarBackground/VBoxContainer/HBoxContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_e0alx")
+text = "Test"
+
+[node name="Space2" type="Control" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(18, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ButtonAdd" type="Button" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 4
+text = " + "
+
+[node name="Space3" type="Control" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(18, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ButtonDel" type="Button" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 4
+text = " - "
+
+[node name="Space4" type="Control" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+custom_minimum_size = Vector2(18, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Space6" type="Control" parent="TabBarBackground/VBoxContainer"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Space4" type="HSeparator" parent="TabBarBackground/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("1_frrgb")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabBarBackground/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+
+[node name="Space3" type="Control" parent="TabBarBackground/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabBarBackground/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+
+[node name="TabItemList" type="VBoxContainer" parent="TabBarBackground/VBoxContainer/HBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(418, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_frrgb")
+
+[node name="Space4" type="Control" parent="TabBarBackground/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+
+[node name="Space3" type="Control" parent="TabBarBackground/VBoxContainer"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+
+[connection signal="button_up" from="TabBarBackground/VBoxContainer/HBoxContainer2/ButtonAdd" to="." method="_on_button_add_button_up"]
+[connection signal="button_up" from="TabBarBackground/VBoxContainer/HBoxContainer2/ButtonDel" to="." method="_on_button_del_button_up"]
