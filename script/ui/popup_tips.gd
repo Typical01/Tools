@@ -24,7 +24,7 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	pass
 
 # 显示/隐藏提示
@@ -54,8 +54,8 @@ func update_position(parent_node: Control):
 	start_position = target_position + Vector2(0, -enter_distance)
 	# 初始设置为起始位置
 	global_position = start_position
-	print("目标位置: ", target_position)
-	print("起始位置: ", start_position)
+	#print("目标位置: ", target_position)
+	#print("起始位置: ", start_position)
 
 func _fade_in():
 	visible = true

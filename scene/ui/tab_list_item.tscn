@@ -41,12 +41,7 @@ corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dqwub"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dddhv"]
-bg_color = Color(0.99607843, 0.99607843, 0.99607843, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_k072o"]
 
 [node name="TabItem" type="Panel"]
 custom_minimum_size = Vector2(418, 40)
@@ -108,7 +103,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("1_vjxyp")
 theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_dddhv")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_k072o")
 clip_text = true
 text_overrun_behavior = 3
 
@@ -127,9 +122,11 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="Up" type="Button" parent="Button/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme = ExtResource("3_6jwuk")
-theme_override_constants/icon_max_width = 16
+theme_override_constants/icon_max_width = 18
 icon = ExtResource("4_k072o")
 
 [node name="Space3" type="Control" parent="Button/HBoxContainer/VBoxContainer"]
@@ -137,6 +134,8 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="Down" type="Button" parent="Button/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme = ExtResource("3_6jwuk")
 theme_override_constants/icon_max_width = 16

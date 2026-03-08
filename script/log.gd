@@ -14,7 +14,7 @@ func _init() -> void:
 		OS.add_logger(self)
 
 # 收到普通消息（包括 print() 和 engine 消息）
-func _log_message(message: String, error: bool) -> void:
+func _log_message(message: String, _error: bool) -> void:
 	# 去掉结尾换行
 	message = message.trim_suffix("\n")
 	# 写文件
@@ -25,7 +25,7 @@ func _log_message(message: String, error: bool) -> void:
 	print(message)
 
 # 收到 error / warning
-func _log_error(function: String, file: String, line: int, code: String, rationale: String, editor_notify: bool, error_type: int, script_backtraces: Array) -> void:
+func _log_error(_function: String, file: String, line: int, _code: String, rationale: String, _editor_notify: bool, _error_type: int, _script_backtraces: Array) -> void:
 	var err_msg = "[ERR] %s:%d %s" % [file, line, rationale]
 	if log_file:
 		log_file.store_string(err_msg + "\n")

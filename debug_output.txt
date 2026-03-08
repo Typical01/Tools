@@ -1,0 +1,9 @@
+01:24:26.409251 http.c:914              == Info: Couldn't find host github.com in the .netrc file; using defaults
+01:24:26.691127 http.c:914              == Info: Host proxy.yourcompany.com:8080 was resolved.
+01:24:26.691127 http.c:914              == Info: IPv6: (none)
+01:24:26.691127 http.c:914              == Info: IPv4: 64.190.63.222
+01:24:26.691127 http.c:914              == Info:   Trying 64.190.63.222:8080...
+01:24:47.726186 http.c:914              == Info: connect to 64.190.63.222 port 8080 from 0.0.0.0 port 10945 failed: Timed out
+01:24:47.726186 http.c:914              == Info: Failed to connect to proxy.yourcompany.com port 8080 after 21316 ms: Could not connect to server
+01:24:47.726186 http.c:914              == Info: closing connection #0
+fatal: unable to access 'https://github.com/Typical01/Tools.git/': Failed to connect to proxy.yourcompany.com port 8080 after 21316 ms: Could not connect to server

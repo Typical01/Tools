@@ -11,12 +11,13 @@ func _ready() -> void:
 	%TabName.text = title
 	
 	for item in tab_item_list:
+		var scene_ins
 		if item.only_scene: #非 TabItem只实例化场景
-			var scene_ins = item.scene_template.instantiate()
+			scene_ins = item.scene_template.instantiate()
 			%TabItemList.add_child(scene_ins)
 			return
 			
-		var scene_ins = item.scene_template.instantiate()
+		scene_ins = item.scene_template.instantiate()
 		scene_ins.custom_minimum_size.x = custom_minimum_size.x - 20
 		size.y += scene_ins.size.y + 10
 		#数据填充
@@ -35,5 +36,5 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	pass

@@ -81,6 +81,7 @@ size_flags_horizontal = 3
 mouse_filter = 2
 
 [node name="ButtonAdd" type="Button" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
 text = " + "
@@ -91,8 +92,10 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="ButtonDel" type="Button" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
+disabled = true
 text = " - "
 
 [node name="Space4" type="Control" parent="TabBarBackground/VBoxContainer/HBoxContainer2"]

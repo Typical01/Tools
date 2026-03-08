@@ -14,6 +14,8 @@ config/name="TypicalTools"
 config/version="v2.0"
 run/main_scene="uid://dqjpsw4etbvkf"
 config/features=PackedStringArray("4.5", "Forward Plus")
+run/low_processor_mode=true
+boot_splash/image="uid://dgskfnhbtw2ru"
 config/icon="res://icon.svg"
 
 [autoload]
@@ -22,9 +24,11 @@ data_manage="*res://script/utils/data_manage.gd"
 coord_utils="*res://script/utils/coord_utils.gd"
 Global="*res://script/Global.gd"
 custom_loggers="*res://script/logger.gd"
+application_mutex="*res://script/utils/application_mutex.gd"
 
 [display]
 
+window/size/viewport_height=800
 window/energy_saving/keep_screen_on=false
 window/subwindows/embed_subwindows=false
 window/per_pixel_transparency/allowed=true
