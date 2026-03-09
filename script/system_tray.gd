@@ -23,6 +23,7 @@ func _ready() -> void:
 		print("SystemTray: 无法获取窗口句柄")
 	
 	%TrayIcon.get_supported_resolutions(0)
+	
 	%General.size.x = \
 		%SettingsWindow.size.x - %TabItem.custom_minimum_size.x - 20
 	#print(%General.size.x)
@@ -399,11 +400,13 @@ func init_settings_page() -> void:
 	var set_resolution_button = temp_tab_item_list_node.get(1).control_interface_node.get(0)
 	set_resolution_button.init_option_list(%TrayIcon.get_resolutions_list())
 	set_resolution_button.selected = Global.game_config.get("设置", {}).get("修改分辨率", 0)
+	%TrayIcon.set_resolutions_index(set_resolution_button.selected)
 	set_resolution_button.item_selected_index.connect(_on_option_button_set_resolutions_item_selected_index)
 	
 	var restore_resolution_button = temp_tab_item_list_node.get(2).control_interface_node.get(0)
 	restore_resolution_button.init_option_list(%TrayIcon.get_resolutions_list())
 	restore_resolution_button.selected = Global.game_config.get("设置", {}).get("还原分辨率", 0)
+	%TrayIcon.set_restore_resolutions_index(restore_resolution_button.selected)
 	restore_resolution_button.item_selected_index.connect(_on_option_button_restore_resolutions_item_selected_index)
 	
 func _on_tray_menu_set_window_from_taskbar() -> void:
